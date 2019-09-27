@@ -34,7 +34,7 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
-from utils.methods.phasereset import phase_reset
+from utils.methods.methods import calcPhaseResetIdx, calcInstaPhaseNorm
 from utils.disp.showphases import showphases
 
 
@@ -64,11 +64,11 @@ def main(args):
     print('Log directory: %s' % log_dir)
 
     channels, fs, stims = readchannels()
-    # cz = channels[256, :]
-    coeffs = phase_reset()
+    cz = channels[255, :]
+    inst_phase_norm = calcInstaPhaseNorm(cz)
+    # coeffs = calcPhaseResetIdx((1, stims, inst_phase_norm)
 
-
-    debug_stop = 1
+    stop = 1
 
 def store_revision_info(src_path, output_dir, arg_string):
     # Get git hash
