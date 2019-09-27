@@ -35,7 +35,7 @@ from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
 from utils.methods.methods import calcPhaseResetIdx, calcInstaPhaseNorm
-from utils.disp.showphases import showphases
+from utils.disp.showphases import showphases, show_signal
 
 
 def main(args):
@@ -64,9 +64,22 @@ def main(args):
     print('Log directory: %s' % log_dir)
 
     channels, fs, stims = readchannels()
-    cz = channels[255, :]
-    inst_phase_norm = calcInstaPhaseNorm(cz)
-    # coeffs = calcPhaseResetIdx((1, stims, inst_phase_norm)
+    cz = channels[255, 0:10000]
+    stims = stims[1,:][0:6]
+    show_signal(cz)
+    # notch
+
+    # show_signal(cz_nf)
+    # cz = cz_nf
+
+    # low pass twice (flip/flip back)
+
+    # show_signal(cz_lp)
+    # cz = cz_lp
+
+    insta_phase_norm = calcInstaPhaseNorm(cz)
+    show_signal(insta_phase_norm)
+    coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
 
     stop = 1
 

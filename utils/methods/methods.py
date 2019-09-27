@@ -5,18 +5,21 @@ import math
 
 def calcInstaPhaseNorm(signal):
 
-    insta_phase = hilbert(signal)
-    insta_phase_norm = insta_phase/(2*math.pi)  # math.fmod(insta_phase/(2*math.pi), 1.)
+    y = hilbert(signal)
+    angles = np.angle(y)
+    insta_phase = np.unwrap(angles)
+    insta_phase_norm = (insta_phase + math.pi)/(2*math.pi) % 1. # math.fmod(insta_phase/(2*math.pi), 1.)
 
     return insta_phase_norm
 
 
 def calcPhaseResetIdx(v, t_k, phi_j):
 
-    check11 = phi_j[t_k]
-    # check12 = i*v*2*pi*phi_j[t_k]
-    # check13 = exp(1i*v*2*pi*phi_j[t_k])
-    check14 = np.mean(v*check11)  # mean(exp(1i*v*2*pi*phi_j[t_k]))
-    phase_index = abs(check14)  # abs(mean(exp(1i*2*pi*phi_j[t_k])))
+    step1 = phi_j[t_k.astype(int)]
+    #!!!! check with Peter!! it seems that in his paper phi goes from 0 to 2pi not -pi to pi as it is a convention
+    step2 = 1j*v*2*math.pi*phi_j[t_k.astype(int)]
+    step3 = np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)])
+    step4 = np.mean(np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))  # mean(exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))
+    phase_index = np.abs(np.mean(np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)])))  # abs(mean(exp(1j*2*math.pi*phi_j[t_k.astype(int)])))
 
     return phase_index
