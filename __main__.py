@@ -35,7 +35,7 @@ from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
 from utils.methods.methods import calcPhaseResetIdx, calcInstaPhaseNorm
-from utils.disp.showphases import showphases, show_signal
+from utils.disp.showphases import showphases, show_signal, show_windows
 
 
 def main(args):
@@ -64,9 +64,11 @@ def main(args):
     print('Log directory: %s' % log_dir)
 
     channels, fs, stims = readchannels()
-    cz = channels[255, 0:10000]
-    stims = stims[1,:][0:6]
+    cz = channels[255, :]  # 0:10000
+    stims = stims[1,:]  # [0:6]
     show_signal(cz)
+    show_windows(cz, stims)
+
     # notch
 
     # show_signal(cz_nf)
