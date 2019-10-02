@@ -34,8 +34,10 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
-from utils.methods.methods import calcPhaseResetIdx, calcInstaPhaseNorm
-from utils.disp.showphases import showphases, show_signal, show_windows
+from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm
+from utils.methods.fouriers import calcFFT
+from utils.disp.showphases import showphases, show_signal, show_windows, showFFT
+from scipy import signal
 
 
 def main(args):
@@ -64,24 +66,38 @@ def main(args):
     print('Log directory: %s' % log_dir)
 
     channels, fs, stims = readchannels()
-    cz = channels[255, :]  # 0:10000
-    stims = stims[1,:]  # [0:6]
+
+    cz = channels[255, :]
+    stims = stims[1, :]  # [0:6]
+    stims = stims[2:]
+
+    if (0):
+        dur = 10000
+        cz = cz[0:10000]
+        stims = stims[stims < dur]
+
     show_signal(cz)
-    show_windows(cz, stims)
+    # P1, xf = calcFFT(cz, fs)
+    # showFFT(P1, xf)
+    # tf = calc_stft(cz)
+    # show_tf(tf)
+    # show_windows(cz, stims, fs)
 
     # notch
+    order = 6
+    cutoff = 3.667
+    y1 = butter_filter(cz, cutoff, fs, order)
+    f0 = 60.
+    Q = 30.
+    b, a = signal.iirnotch(2 * f0 / fs, Q)
+    y2 = signal.filtfilt(b, a, y1)
+    P1, xf = calcFFT(y2, fs)
+    showFFT(P1, xf)
 
-    # show_signal(cz_nf)
-    # cz = cz_nf
-
-    # low pass twice (flip/flip back)
-
-    # show_signal(cz_lp)
-    # cz = cz_lp
-
-    insta_phase_norm = calcInstaPhaseNorm(cz)
+    insta_phase_norm = calcInstaPhaseNorm(y2)
     show_signal(insta_phase_norm)
-    coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
+    # coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
+    coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100)
 
     stop = 1
 
@@ -117,6 +133,18 @@ def write_arguments_to_file(args, filename):
     with open(filename, 'w') as f:
         for key, value in iteritems(vars(args)):
             f.write('%s: %s\n' % (key, str(value)))
+
+
+def butter(cutoff, fs, order=5):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
+    return b, a
+
+def butter_filter(data, cutoff, fs, order=5):
+    b, a = butter(cutoff, fs, order=order)
+    y = signal.filtfilt(b, a, data)
+    return y
 
 
 def parse_arguments(argv):
