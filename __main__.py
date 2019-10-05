@@ -36,9 +36,11 @@ from subprocess import Popen, PIPE
 from utils.io.read import readchannels
 from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm
 from utils.methods.fouriers import calcFFT
-from utils.disp.showphases import showphases, show_signal, show_windows, showFFT
+from utils.methods.n1p1 import n1p1, rerefAll
+from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals
 from scipy import signal
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 def main(args):
 
@@ -46,7 +48,7 @@ def main(args):
     if ~os.path.isabs(args.output_base_dir):
         dirpath = os.path.dirname(__file__)
         args.output_base_dir = os.path.join(dirpath, args.output_base_dir)
-    output_dir = os.path.join(os.path.expanduser(args.output_base_dir), subdir)
+    output_dir =     os.path.join(os.path.expanduser(args.output_base_dir), subdir)
     if not os.path.isdir(output_dir):  # Create the model directory if it doesn't exist
         os.makedirs(output_dir)
     log_dir = args.logs_base_dir
@@ -67,39 +69,64 @@ def main(args):
 
     channels, fs, stims = readchannels()
 
-    cz = channels[255, :]
     stims = stims[1, :]  # [0:6]
     stims = stims[2:]
 
-    if (0):
-        dur = 10000
-        cz = cz[0:10000]
-        stims = stims[stims < dur]
+#    for cnt in range(256):
+    cnt = 254
+    if(1):
+        cz = channels[cnt, :]
+        if (0):
+            dur = 10000
+            cz = cz[0:10000]
+            stims = stims[stims < dur]
 
-    show_signal(cz)
-    # P1, xf = calcFFT(cz, fs)
-    # showFFT(P1, xf)
-    # tf = calc_stft(cz)
-    # show_tf(tf)
-    # show_windows(cz, stims, fs)
+        # show_signal(cz)
 
-    # notch
-    order = 6
-    cutoff = 3.667
-    y1 = butter_filter(cz, cutoff, fs, order)
-    f0 = 60.
-    Q = 30.
-    b, a = signal.iirnotch(2 * f0 / fs, Q)
-    y2 = signal.filtfilt(b, a, y1)
-    P1, xf = calcFFT(y2, fs)
-    showFFT(P1, xf)
+        # re - referencing
+        #czr = reref(cz, channels)
 
-    insta_phase_norm = calcInstaPhaseNorm(y2)
-    show_signal(insta_phase_norm)
-    # coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
-    coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100)
+        czr = cz
+        if (0):
+            meanref = rerefAll(channels)
+            czr = cz - meanref
+            show_signal(czr)
 
-    stop = 1
+        # covariance matrix
+
+        # check it out DSS
+
+        # std of boostrap
+
+        P1, xf = calcFFT(cz, fs)
+#        showFFT(P1, xf)
+        P1m = 20 * np.log10(P1 / max(P1))
+#        showFFT(P1m, xf)
+        # tf = calc_stft(cz)
+        # show_tf(tf)
+        # show_windows(cz, stims, fs)
+
+        # notc
+        order = 6
+        cutoff = 3.667
+        y1 = butter_filter(czr, cutoff, fs, order)
+        f0 = 60.
+        Q = 10.
+        b, a = signal.iirnotch(2 * f0 / fs, Q)
+        y2 = signal.filtfilt(b, a, y1)
+        P1, xf = calcFFT(y2, fs)
+        P1m = 20 * np.log10(P1 / max(P1))
+        showFFT(P1m, xf)
+
+        #insta_phase_norm = calcInstaPhaseNorm(y2)
+        #show_signal(insta_phase_norm)
+        # coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
+        # coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100)
+
+        ave_y2_500, std_y2_500, ave_y2_1000, std_y2_1000 = n1p1(y2, stims, 0, 2000)
+        show_2signals(ave_y2_500, ave_y2_1000, output_dir, cnt)
+        # show_2signals(std_y2_500, std_y2_1000)
+        stop = 1
 
 def store_revision_info(src_path, output_dir, arg_string):
     # Get git hash

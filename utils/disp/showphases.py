@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from utils.methods.fouriers import calcFFT
 import numpy as np
 from scipy import signal
+import os.path
 
 
 def butter_lowpass(cutoff, fs, order=5):
@@ -24,6 +25,20 @@ def show_signal(signal):  # , t, output_dir, filename, axisname):
     # plt.xlabel(axisname)
     # plt.savefig(os.path.join(output_dir, filename))
     plt.show()
+    return 0
+
+
+def show_2signals(signal1, signal2, output_dir, cnt):  # , t, output_dir, filename, axisname):
+    filename = str(cnt) + '.png'
+    t = np.arange(0, len(signal1))
+    plt.plot(t, signal1, t, signal2)  # t,
+    plt.ylim(-6, 6)
+    # plt.title('Original signal')
+    # plt.ylabel('Amplitude')
+    # plt.xlabel(axisname)
+    plt.savefig(os.path.join(output_dir, filename))
+    plt.close()
+    #plt.show()
     return 0
 
 
@@ -104,7 +119,7 @@ def show_windows(x, tk, fs):
 def showFFT(P1, xf):
 
     plt.plot(xf, P1)
-    plt.ylim(0, 20)
+    plt.ylim(-200, 20)
     plt.xlim(0, 100)
     plt.show()
 
