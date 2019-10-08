@@ -18,6 +18,16 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     return y
 
 
+def show_insta_phase(signal):
+    plt.plot(signal, 'b*')  # t,
+    # plt.title('Original signal')
+    # plt.ylabel('Amplitude')
+    # plt.xlabel(axisname)
+    # plt.savefig(os.path.join(output_dir, filename))
+    plt.show()
+    return 0
+
+
 def show_signal(signal):  # , t, output_dir, filename, axisname):
     plt.plot(signal)  # t,
     # plt.title('Original signal')
@@ -119,7 +129,7 @@ def show_windows(x, tk, fs):
 def showFFT(P1, xf):
 
     plt.plot(xf, P1)
-    plt.ylim(-200, 20)
+    #plt.ylim(-200, 20)
     plt.xlim(0, 100)
     plt.show()
 

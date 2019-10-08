@@ -34,7 +34,7 @@ def calcPhaseResetIdxWin(v, t_k, phi_j, win_l, win_r):
     for i in t_k:
         check0 = i[0].astype(int)-win_l
         check1 = i[0].astype(int) + win_r
-        step1 = phi_j[check0[0]-win_l : check1[0]+win_r]
+        step1 = phi_j[check0[0] : check1[0]]
         #!!!! check with Peter!! it seems that in his paper phi goes from 0 to 2pi not -pi to pi as it is a convention
         step2 = 1j*v*2*math.pi*step1
         step3 = np.exp(step2)
@@ -42,10 +42,11 @@ def calcPhaseResetIdxWin(v, t_k, phi_j, win_l, win_r):
         step3_all += step3
         # step4 = np.mean(np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))  # mean(exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))
 
-    phase_index = np.mean(step3_all)  # abs(mean(exp(1j*2*math.pi*phi_j[t_k.astype(int)])))
+    # phase_index = np.mean(step3_all)  # abs(mean(exp(1j*2*math.pi*phi_j[t_k.astype(int)])))
 
-    showphases(phase_index)
+    phase_index = np.abs(step3_all)
+    # showphases(phase_index)
 
-    print(np.abs(phase_index))
+    #print(np.abs(phase_index))
 
     return phase_index
