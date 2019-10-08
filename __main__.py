@@ -80,20 +80,30 @@ def main(args):
     #if(1):
         cz = channels[cnt, :]
         t = np.arange(0, len(cz)/fs, 1/fs)
+        t1 = np.arange(0, 2000 / fs, 1 / fs)
+        lmbd = 11
+        test = np.exp(-lmbd * t1)
+        test1 = np.sin(2 * np.pi * 13 * t1)
+        test2 = test1*test
+        #show_signal(test2)
         phase0 = np.zeros(len(cz))
-        randomJump = 10*np.random.rand(1, len(stims))
-        randomJump = randomJump[0]
-        phaseR = phase0
+        aJump = 10*np.ones(len(cz)) #np.random.rand(1, len(stims)) add some noise
+        #aJump = aJump[0]
+        phase = phase0
+        cz = np.zeros(len(cz))
         for cnt, i in enumerate(stims):
             temp = i[0].astype(int)
-            phaseR[temp[0]] = randomJump[cnt]
-        phase = np.cumsum(phaseR)
-        cz = np.sin(2 * np.pi * 13 * t + phase)
+            # phase[temp[0]:temp[0]+2000] = test
+            cz[temp[0]:temp[0]+2000] = test2
+        # phase = np.cumsum(phaseR)
+        #phase = np.convolve()
+        show_signal(cz)
+#        cz = np.sin(2 * np.pi * 13 * t + phase)
         # show_signal(cz)
 
-        #noise = 0.01*np.random.randn(1, len(t))
+        noise = 0.1*np.random.randn(1, len(t))
 
-        #cz += noise[0]
+        cz += noise[0]
 
         show_signal(cz)
 
@@ -126,30 +136,30 @@ def main(args):
         # show_tf(tf)
         # show_windows(cz, stims, fs)
 
-        # notc
-        order = 6
-        cutoff = 3.667
-        y1 = butter_filter(czr, cutoff, fs, order)
+        # # notc
+        # order = 6
+        # cutoff = 3.667
+        # y1 = butter_filter(czr, cutoff, fs, order)
 
-#        P1, xf = calcFFT(y1, fs)
-#        P1m = 20 * np.log10(P1 / max(P1))
-#        showFFT(P1m, xf)
+        # P1, xf = calcFFT(y1, fs)
+        # P1m = 20 * np.log10(P1 / max(P1))
+        # showFFT(P1m, xf)
 
-        if (0):
-            f0 = 60.
-            Q = 10.
-            b, a = signal.iirnotch(2 * f0 / fs, Q)
-            y2 = signal.filtfilt(b, a, y1)
-            # P1, xf = calcFFT(y2, fs)
-            # P1m = 20 * np.log10(P1 / max(P1))
-            # showFFT(P1m, xf)
-        else:
-            # show_signal(y1)
-            y2 = Implement_Notch_Filter(1000., 0.25, 60., 5., 3, 'butter', y1)
-            show_signal(y2)
-            P1, xf = calcFFT(y2, fs)
-            P1m = 20 * np.log10(P1 / max(P1))
-            showFFT(P1m, xf)
+        # if (0):
+        #     f0 = 60.
+        #     Q = 10.
+        #     b, a = signal.iirnotch(2 * f0 / fs, Q)
+        #     y2 = signal.filtfilt(b, a, y1)
+        #     # P1, xf = calcFFT(y2, fs)
+        #     # P1m = 20 * np.log10(P1 / max(P1))
+        #     # showFFT(P1m, xf)
+        # else:
+        #     # show_signal(y1)
+        #     y2 = Implement_Notch_Filter(1000., 0.25, 60., 5., 3, 'butter', y1)
+        #     show_signal(y2)
+        #     # P1, xf = calcFFT(y2, fs)
+        #     # P1m = 20 * np.log10(P1 / max(P1))
+        #     # showFFT(P1m, xf)
 
         # insta_phase_norm = calcInstaPhaseNorm(y2)
         # show_signal(insta_phase_norm)
@@ -159,9 +169,10 @@ def main(args):
         # ave_y2_500, std_y2_500, ave_y2_1000, std_y2_1000 = n1p1(y2, stims, 400, 2000)
         # show_2signals(ave_y2_500, ave_y2_1000, output_dir, cnt)
 
+        y2 = cz #!!!! omit later
         insta_phase_norm = calcInstaPhaseNorm(y2)
         show_insta_phase(insta_phase_norm)
-        coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 400, 2000)
+        coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 400, 1000)
         show_signal(coeffswin)
         # show_2signals(std_y2_500, std_y2_1000)
 
