@@ -38,6 +38,23 @@ def show_signal(signal):  # , t, output_dir, filename, axisname):
     return 0
 
 
+def show_csignals(signal, output_dir, cnt):  # , t, output_dir, filename, axisname):
+    filename = str(cnt) + '.png'
+    print(np.size(signal, 1))
+    t = np.arange(0, np.size(signal, 1))
+    for cnt in range(0, np.size(signal, 0)):
+        plt.plot(t, signal[cnt, :])  # t,
+    #plt.ylim(-6, 6)
+    # plt.title('Original signal')
+    # plt.ylabel('Amplitude')
+    # plt.xlabel(axisname)
+    plt.savefig(os.path.join(output_dir, filename))
+    plt.show()
+    plt.waitforbuttonpress(0.1)
+    plt.close()
+    return 0
+
+
 def show_2signals(signal1, signal2, output_dir, cnt):  # , t, output_dir, filename, axisname):
     filename = str(cnt) + '.png'
     t = np.arange(0, len(signal1))

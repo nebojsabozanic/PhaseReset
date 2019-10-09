@@ -25,11 +25,12 @@ def n1p1c(signal, times, wind_l, wind_r, classes, uc, uc_ind, len_uc):
         i1 = i[0].astype(int)
         wind_[cnti, :] = signal[i1[0] - wind_l : i1[0] + wind_r] # faster
 
+    #print(len_uc)
     ave_wind = np.zeros([len_uc, wind_l + wind_r])
     for i, uclass in enumerate(uc):
         ind = (uc_ind == i)
-        print(i)
-        print(ind)
+        # print(i)
+        # print(ind)
         ave_wind = np.mean(wind_[ind, :], 0)
         std_wind = np.std(wind_[ind, :], 0)
 
