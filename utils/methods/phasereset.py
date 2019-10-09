@@ -2,10 +2,10 @@ import numpy as np
 from scipy.signal import hilbert
 import math
 from utils.disp.showphases import showphases, show_signal
-
+import time
+from scipy.fftpack import fft
 
 def calcInstaPhaseNorm(signal):
-
     y = hilbert(signal)
     angles = np.angle(y)
     insta_phase = np.unwrap(angles)
@@ -39,7 +39,7 @@ def calcPhaseResetIdxWin(v, t_k, phi_j, win_l, win_r):
         #!!!! check with Peter!! it seems that in his paper phi goes from 0 to 2pi not -pi to pi as it is a convention
         step2 = 1j*v*2*math.pi*step1
         step3 = np.exp(step2)
-        # showphases(step3)
+        # show_signal(step3)
         step3_all += step3
         # step4 = np.mean(np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))  # mean(exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))
 

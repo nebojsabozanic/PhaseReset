@@ -36,13 +36,14 @@ from subprocess import Popen, PIPE
 from utils.io.read import readchannels
 from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm
 from utils.methods.fouriers import calcFFT
-from utils.methods.n1p1 import n1p1, rerefAll
+from utils.methods.n1p1 import n1p1, rerefAll, n1p1c
 from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase
 from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 import random
+import time
 
 
 def main(args):
@@ -72,46 +73,62 @@ def main(args):
 
     channels, fs, stims = readchannels()
 
+    cutit = 0
+
+    classes = stims[0, :]
+    classes = classes[2:]
+
+    uc, uc_ind = np.unique(classes, return_inverse=True)
+    len_uc = len(uc)
+    # unique
     stims = stims[1, :]  # [0:6]
     stims = stims[2:]
+
+    if (cutit):
+        dur = 100000
+        stims = stims[stims < dur]
+        classes = classes[stims < dur]
+
 
     for cnt in range(256):
     # cnt = 222
     #if(1):
         cz = channels[cnt, :]
+        if (len(cz) % 2):
+            cz = cz[:-1]
         t = np.arange(0, len(cz)/fs, 1/fs)
         t1 = np.arange(0, 2000 / fs, 1 / fs)
-        lmbd = 11
+        lmbd = 9
         test = np.exp(-lmbd * t1)
-        test1 = np.sin(2 * np.pi * 13 * t1)
+        test1 = 0.55*np.sin(2 * np.pi * 13 * t1)
         test2 = test1*test
         #show_signal(test2)
         phase0 = np.zeros(len(cz))
         aJump = 10*np.ones(len(cz)) #np.random.rand(1, len(stims)) add some noise
         #aJump = aJump[0]
         phase = phase0
-        cz = np.zeros(len(cz))
+        cz1 = np.zeros(len(cz))
         for cnt, i in enumerate(stims):
             temp = i[0].astype(int)
-            # phase[temp[0]:temp[0]+2000] = test
-            cz[temp[0]:temp[0]+2000] = test2
+            jitter = random.randint(1, 100) - 25
+            # phase[temp[0]+jitter:temp[0]+jitter+2000] = test
+            cz1[temp[0]+jitter:temp[0]+jitter+2000] = test2
         # phase = np.cumsum(phaseR)
         #phase = np.convolve()
-        show_signal(cz)
+        #show_signal(cz1)
 #        cz = np.sin(2 * np.pi * 13 * t + phase)
         # show_signal(cz)
 
         noise = 0.1*np.random.randn(1, len(t))
 
-        cz += noise[0]
+        cz1 += noise[0]
 
+        #cz = cz1
         show_signal(cz)
 
-        if (0):
-            dur = 10000
-            cz = cz[0:10000]
+        if (cutit):
+            cz = cz[0:dur]
             stims = stims[stims < dur]
-
 
         # re - referencing
         #czr = reref(cz, channels)
@@ -137,29 +154,31 @@ def main(args):
         # show_windows(cz, stims, fs)
 
         # # notc
-        # order = 6
-        # cutoff = 3.667
-        # y1 = butter_filter(czr, cutoff, fs, order)
+        order = 6
+        cutoff = 3.667
+        y1 = butter_filter(czr, cutoff, fs, order)
 
         # P1, xf = calcFFT(y1, fs)
         # P1m = 20 * np.log10(P1 / max(P1))
         # showFFT(P1m, xf)
 
-        # if (0):
-        #     f0 = 60.
-        #     Q = 10.
-        #     b, a = signal.iirnotch(2 * f0 / fs, Q)
-        #     y2 = signal.filtfilt(b, a, y1)
-        #     # P1, xf = calcFFT(y2, fs)
-        #     # P1m = 20 * np.log10(P1 / max(P1))
-        #     # showFFT(P1m, xf)
-        # else:
-        #     # show_signal(y1)
-        #     y2 = Implement_Notch_Filter(1000., 0.25, 60., 5., 3, 'butter', y1)
-        #     show_signal(y2)
-        #     # P1, xf = calcFFT(y2, fs)
-        #     # P1m = 20 * np.log10(P1 / max(P1))
-        #     # showFFT(P1m, xf)
+        if (0):
+            f0 = 60.
+            Q = 10.
+            b, a = signal.iirnotch(2 * f0 / fs, Q)
+            y2 = signal.filtfilt(b, a, y1)
+            # show_signal(y2)
+            # P1, xf = calcFFT(y2, fs)
+            # P1m = 20 * np.log10(P1 / max(P1))
+            # showFFT(P1m, xf)
+        else:
+            # show_signal(y1)
+            y2 = Implement_Notch_Filter(1000., 0.25, 60., 5., 3, 'butter', y1)
+
+            # show_signal(y2)
+            # P1, xf = calcFFT(y2, fs)
+            # P1m = 20 * np.log10(P1 / max(P1))
+            # showFFT(P1m, xf)
 
         # insta_phase_norm = calcInstaPhaseNorm(y2)
         # show_signal(insta_phase_norm)
@@ -167,11 +186,15 @@ def main(args):
         # coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100)
 
         # ave_y2_500, std_y2_500, ave_y2_1000, std_y2_1000 = n1p1(y2, stims, 400, 2000)
-        # show_2signals(ave_y2_500, ave_y2_1000, output_dir, cnt)
+        ave_y2, std_y2 = n1p1c(y2, stims, 400, 2000, classes, uc, uc_ind, len_uc)
 
-        y2 = cz #!!!! omit later
+        #show_2signals(ave_y2_500, ave_y2_1000, output_dir, cnt)
+        #show_csignals(ave_y2, output_dir, cnt)
+
+    # y2 = y1 ## cz #!!!! omit later
         insta_phase_norm = calcInstaPhaseNorm(y2)
-        show_insta_phase(insta_phase_norm)
+
+    #    show_insta_phase(insta_phase_norm)
         coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 400, 1000)
         show_signal(coeffswin)
         # show_2signals(std_y2_500, std_y2_1000)
