@@ -34,7 +34,7 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
-from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm
+from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
 from utils.methods.fouriers import calcFFT
 from utils.methods.n1p1 import n1p1, rerefAll, n1p1c
 from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals
@@ -186,7 +186,7 @@ def main(args):
         # coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100)
 
         # ave_y2_500, std_y2_500, ave_y2_1000, std_y2_1000 = n1p1(y2, stims, 400, 2000)
-        ave_y2, std_y2 = n1p1c(y2, stims, 400, 2000, classes, uc, uc_ind, len_uc)
+        ave_y2, std_y2 = n1p1c(y2, stims, 400, 2000, uc, uc_ind, len_uc)
         # print(np.size(ave_y2))
 
         #show_2signals(ave_y2_500, ave_y2_1000, output_dir, cnt)
@@ -196,8 +196,10 @@ def main(args):
         insta_phase_norm = calcInstaPhaseNorm(y2)
 
     #    show_insta_phase(insta_phase_norm)
-        coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 400, 1000)
+        coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 1000)
         show_signal(coeffswin)
+        #coeffswin = calcPhaseResetIdxWin_c(1, insta_phase_norm, stims, 100, 1000, uc, uc_ind, len_uc)
+        #show_csignals(coeffswin, output_dir, cnt)
         # show_2signals(std_y2_500, std_y2_1000)
 
         #temp = stats.zscore(ave_y2_500)

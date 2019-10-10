@@ -52,3 +52,48 @@ def calcPhaseResetIdxWin(v, t_k, phi_j, win_l, win_r):
     #print(np.abs(phase_index))
 
     return phase_index
+
+
+def calcPhaseResetIdxWin_c(v, phi_j, times, wind_l, wind_r, uc, uc_ind, len_uc):
+
+    wind_ = np.zeros([len(times), wind_l + wind_r])
+    for cnti, i in enumerate(times):
+
+        i1 = i[0].astype(int)
+        wind_[cnti, :] = phi_j[i1[0] - wind_l : i1[0] + wind_r] # faster
+
+    #print(len_uc)
+    ave_step3 = np.zeros([len_uc, wind_l + wind_r])
+    std_step3 = np.zeros([len_uc, wind_l + wind_r])
+
+    step2 = 1j*v*2*math.pi*wind_
+    step3 = np.exp(step2)
+
+    for i, uclass in enumerate(uc):
+        ind = (uc_ind == i)
+        # print(i)
+        # print(ind)
+        ave_step3[i, :] = np.mean(step3[ind, :], 0)
+        std_step3[i, :] = np.std(step3[ind, :], 0)
+
+    step3_all = 0
+    for i in times:
+        check0 = i[0].astype(int) - wind_l
+        check1 = i[0].astype(int) + wind_r
+        step1 = phi_j[check0[0] : check1[0]]
+        #show_signal(step1)
+        #!!!! check with Peter!! it seems that in his paper phi goes from 0 to 2pi not -pi to pi as it is a convention
+        step2 = 1j*v*2*math.pi*step1
+        step3 = np.exp(step2)
+        # show_signal(step3)
+        step3_all += step3
+        # step4 = np.mean(np.exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))  # mean(exp(1j*v*2*math.pi*phi_j[t_k.astype(int)]))
+
+    # phase_index = np.mean(step3_all)  # abs(mean(exp(1j*2*math.pi*phi_j[t_k.astype(int)])))
+
+    phase_index = np.abs(ave_step3)
+    # showphases(phase_index)
+
+    #print(np.abs(phase_index))
+
+    return phase_index

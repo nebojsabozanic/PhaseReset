@@ -40,9 +40,9 @@ def show_signal(signal):  # , t, output_dir, filename, axisname):
 
 def show_csignals(signal, output_dir, cnt):  # , t, output_dir, filename, axisname):
     filename = str(cnt) + '.png'
-    print(np.size(signal, 1))
-    t = np.arange(0, np.size(signal, 1))
-    for cnt in range(0, np.size(signal, 0)):
+    print(signal.shape[0])
+    t = np.arange(0, signal.shape[1])
+    for cnt in range(0, signal.shape[0]):
         plt.plot(t, signal[cnt, :])  # t,
     #plt.ylim(-6, 6)
     # plt.title('Original signal')
