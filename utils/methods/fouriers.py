@@ -1,9 +1,8 @@
 import numpy as np
 from scipy.fftpack import fft
-import math
 
 
-def calcFFT(signal, fs):
+def power_spectrum_fft(signal, fs):
 
     L = len(signal)
     yf = fft(signal)

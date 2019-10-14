@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 # import os.path
-from utils.methods.fouriers import calcFFT
+from utils.methods.fouriers import power_spectrum_fft
 import numpy as np
 from scipy import signal
 import os.path
@@ -38,20 +38,37 @@ def show_signal(signal):  # , t, output_dir, filename, axisname):
     return 0
 
 
+def show_examples(args):
+
+    # show random raw
+
+    # show random filtered
+
+    # show random filtered-notch
+
+    #
+
+    return 0
+
+
 def show_csignals(signal, output_dir, cnt):  # , t, output_dir, filename, axisname):
-    filename = str(cnt) + '.png'
     print(signal.shape[0])
     t = np.arange(0, signal.shape[1])
-    for cnt in range(0, signal.shape[0]):
-        plt.plot(t, signal[cnt, :])  # t,
+    for cnt1 in range(0, signal.shape[0]):
+        filename = str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
+        plt.plot(t, signal[cnt1, :])  # t,
+        #plt.show()
+        #plt.waitforbuttonpress(0.1)
+        plt.savefig(os.path.join(output_dir, filename))
+        plt.close()
     #plt.ylim(-6, 6)
     # plt.title('Original signal')
     # plt.ylabel('Amplitude')
     # plt.xlabel(axisname)
-    plt.savefig(os.path.join(output_dir, filename))
-    plt.show()
-    plt.waitforbuttonpress(0.1)
-    plt.close()
+    #plt.savefig(os.path.join(output_dir, filename))
+    #plt.show()
+    #plt.waitforbuttonpress(0.1)
+    #plt.close()
     return 0
 
 
@@ -147,7 +164,7 @@ def showFFT(P1, xf):
 
     plt.plot(xf, P1)
     #plt.ylim(-200, 20)
-    plt.xlim(0, 100)
+   #  plt.xlim(0, 200)
     plt.show()
 
     return 0
