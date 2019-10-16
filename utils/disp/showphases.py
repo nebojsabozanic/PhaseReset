@@ -1,5 +1,5 @@
-import matplotlib
-matplotlib.use('GTKAgg')
+# import matplotlib
+# matplotlib.use('GTKAgg')
 import matplotlib.pyplot as plt
 
 # import os.path

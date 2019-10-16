@@ -33,18 +33,10 @@ import argparse
 
 from six import iteritems
 from subprocess import Popen, PIPE
-from utils.io.read import readchannels
-from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c, histogram_phases
 from utils.methods.fouriers import power_spectrum_fft
-from utils.methods.process import proc
-from utils.methods.n1p1 import n1p1, rerefAll, n1p1c
 from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals, show_phase_reset
-from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import stats
-import random
-import time
 
 
 def main(args):
@@ -86,8 +78,8 @@ def main(args):
     test2 = test1*test
     show_signal(test2)
     # cz11 = np.random.rand(lent)
-    cz1 = np.ones([1, lent])
-    show_signal(cz1)
+    cz1 = np.zeros([1, lent])
+    # show_signal(cz1)
     temp0 = 0
     for cnt in range(10):
         temp0 += 3126
@@ -96,8 +88,7 @@ def main(args):
 
     # show_signal(cz0)
     print('cz1')
-    # plt.plot(cz1)
-    # plt.show()
+    show_signal(cz1)
 
     P1, xf = power_spectrum_fft(cz1, fs)
     showFFT(P1, xf)

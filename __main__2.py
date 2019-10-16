@@ -36,7 +36,7 @@ from subprocess import Popen, PIPE
 from utils.io.read import readchannels
 from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c, histogram_phases
 from utils.methods.fouriers import power_spectrum_fft
-from utils.methods.process import proc
+from utils.methods.process import proc, getStats
 from utils.methods.n1p1 import n1p1, rerefAll, n1p1c
 from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals, show_phase_reset
 from scipy import signal
@@ -89,7 +89,7 @@ def main(args):
         #if (len(cz) % 2):
             #cz = cz[:-1]
         cz = cz[:-37]
-        fst1 = 2000.
+        fst1 = 1000.
         t = np.arange(0, len(cz)/fst1, 1/fst1)
         lent1 = 1347
         t1 = np.arange(0, lent1 / fst1, 1 / fst1)
@@ -106,11 +106,13 @@ def main(args):
         cz0 = np.zeros(len(cz))
         times = args.stims[1, 2:]
         temp0 = 0
+        temps = np.zeros(1)
         for cnt, i in enumerate(times):
             temp = i[0].astype(int)
+            temps = np.append(temps, temp)
             temp0 += 3126
-            # if cnt < 20:
-            cz0[temp[0]:temp[0] + lent1] = test2[0:lent1]
+            if cnt < 100:
+                cz0[temp[0]:temp[0] + lent1] = test2[0:lent1]
             jitter = 0 # random.randint(1, 60) - 30
             # phase[temp[0]+jitter:temp[0]+jitter+2000] = test
             cz1[temp[0]+jitter:temp[0]+jitter+lent1] = test2[0:lent1]
@@ -119,6 +121,8 @@ def main(args):
         #show_signal(cz1)
 #        cz = np.sin(2 * np.pi * 13 * t + phase)
         print('cz0')
+        diftimes = np.diff(temps)
+        f_diftimes = 1./diftimes
         show_signal(cz0)
         P1, xf = power_spectrum_fft(cz0, fst1)
         # P1m = 20 * np.log10(P1 / max(P1))
@@ -130,10 +134,8 @@ def main(args):
         cz = cz1
         show_signal(cz1)
 
-        cutit = 0
-        if (cutit):
-            cz = cz[0:dur]
-            stims = stims[stims < dur]
+        args.times = temps
+        args = getStats(args)
 
         # re - referencing
         #czr = reref(cz, channels)
