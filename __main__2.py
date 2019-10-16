@@ -78,6 +78,7 @@ def main(args):
     if(1):
         args.stims[0, 102:] = 'stan2'
     fs = args.fs
+    print(fs)
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
     # args = proc(args)
 
@@ -87,9 +88,12 @@ def main(args):
         cz = args.channels[cnt, :]
         #if (len(cz) % 2):
             #cz = cz[:-1]
-        t = np.arange(0, len(cz)/args.fs, 1/args.fs)
-        t1 = np.arange(0, 2000 / args.fs, 1 / args.fs)
-        lmbd = 5
+        cz = cz[:-37]
+        fst1 = 2000.
+        t = np.arange(0, len(cz)/fst1, 1/fst1)
+        lent1 = 1347
+        t1 = np.arange(0, lent1 / fst1, 1 / fst1)
+        lmbd = 0
         test = np.exp(-lmbd * t1)
         test1 = 0.55*np.sin(2 * np.pi * 17 * t1)
         test2 = test1*test
@@ -101,19 +105,22 @@ def main(args):
         cz1 = np.zeros(len(cz))
         cz0 = np.zeros(len(cz))
         times = args.stims[1, 2:]
+        temp0 = 0
         for cnt, i in enumerate(times):
             temp = i[0].astype(int)
-            if cnt < 10:
-                cz0[temp[0]:temp[0] + 2000] = test2[0:2000]
+            temp0 += 3126
+            # if cnt < 20:
+            cz0[temp[0]:temp[0] + lent1] = test2[0:lent1]
             jitter = 0 # random.randint(1, 60) - 30
             # phase[temp[0]+jitter:temp[0]+jitter+2000] = test
-            cz1[temp[0]+jitter:temp[0]+jitter+100] = test2[0:100]
+            cz1[temp[0]+jitter:temp[0]+jitter+lent1] = test2[0:lent1]
         # phase = np.cumsum(phaseR)
         #phase = np.convolve()
         #show_signal(cz1)
 #        cz = np.sin(2 * np.pi * 13 * t + phase)
+        print('cz0')
         show_signal(cz0)
-        P1, xf = power_spectrum_fft(cz0, fs)
+        P1, xf = power_spectrum_fft(cz0, fst1)
         # P1m = 20 * np.log10(P1 / max(P1))
         showFFT(P1, xf)
         #noise = 0.03*np.random.randn(1, len(t))

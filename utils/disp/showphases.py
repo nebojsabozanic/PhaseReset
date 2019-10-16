@@ -1,4 +1,7 @@
+import matplotlib
+matplotlib.use('GTKAgg')
 import matplotlib.pyplot as plt
+
 # import os.path
 from utils.methods.fouriers import power_spectrum_fft
 import numpy as np
