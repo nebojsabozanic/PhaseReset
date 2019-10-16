@@ -4,6 +4,7 @@ from utils.methods.fouriers import power_spectrum_fft
 import numpy as np
 from scipy import signal
 import os.path
+import seaborn as sns
 
 
 def butter_lowpass(cutoff, fs, order=5):
@@ -38,15 +39,53 @@ def show_signal(signal):  # , t, output_dir, filename, axisname):
     return 0
 
 
+def show_phase_reset(signal, output_dir):  # , t, output_dir, filename, axisname):
+    filename = 'phasereset.png'
+    plt.plot(signal)  # t,
+    # plt.title('Original signal')
+    # plt.ylabel('Amplitude')
+    # plt.xlabel(axisname)
+    plt.savefig(os.path.join(output_dir, filename))
+    plt.show()
+    return 0
+
+
 def show_examples(args):
 
+    channel_no = 255 # rand
+    sns.set(style="darkgrid")
+
+    # Load an example dataset with long-form data
+    fmri = sns.load_dataset("fmri")
+
+    # Plot the responses for different events and regions
+    sns.lineplot(x="timepoint", y="signal",
+                 hue="region", style="event",
+                 data=fmri)
+
+    plt.show()
+
+    # Plot the responses for different events and regions
+    sns.lineplot(x="timepoint", y="signal",
+                 hue="region", style="event",
+                 data=np.squeeze(args.ave_wind_all[channel_no, 1, :]))
+
+    plt.show()
+
+    show_signal(np.squeeze(args.ave_wind_all[channel_no, 1, :]))
+    stimulus_no = 15 # rand
     # show random raw
-
+    i = args.times[stimulus_no]
+    check1 = int(i[0][0]) - args.win_l
+    check2 = int(i[0][0]) + args.win_r
+    wind = args.singled_out_filtered_notched[channel_no, check1 : check2]
+    show_signal(wind)
     # show random filtered
-
+    stop = 1
     # show random filtered-notch
 
-    #
+    # p1, xf = power_spectrum_fft(args.singled_out_filtered_notched[cnt, :], args.fs)
+    # showFFT(p1, xf)
 
     return 0
 

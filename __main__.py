@@ -34,14 +34,14 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels
-# from utils.methods.phasereset import calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
+from utils.methods.phasereset import getPhaseResetIndices #calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
 # from utils.methods.fouriers import calcFFT
 from utils.methods.n1p1 import getN1P1  # n1p1, rerefAll, n1p1c
 # from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals
 from utils.methods.process import proc, getStats
 # from scipy import signal
 import time
-
+from utils.disp.showphases import show_examples
 
 def main(args):
 
@@ -78,12 +78,14 @@ def main(args):
     args = proc(args)
     print(time.time() - start)
 
-    args = getStats(args)
+    # args = getStats(args) put in output
 
-    args = getN1P1(args)
+    # args = getN1P1(args)
+
+    # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
-    # args = getPhaseResetIndices(args)
+    args = getPhaseResetIndices(args)
 
 
 def store_revision_info(src_path, output_dir, arg_string):
@@ -147,6 +149,9 @@ def parse_arguments(argv):
 
     parser.add_argument('--dur', type=int,
                         help='duation in case the memory is not too large', default=10000)
+
+    parser.add_argument('--do_rereferencing', type=bool,
+                        help='average rereferencing', default=1)
 
     return parser.parse_args(argv)
 

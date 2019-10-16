@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.signal import hilbert
 import math
-from utils.disp.showphases import showphases, show_signal
+from utils.disp.showphases import showphases, show_signal, show_csignals
 import time
 from scipy.fftpack import fft
+import matplotlib.pyplot as plt
 
 def calcInstaPhaseNorm(signal):
     y = hilbert(signal)
@@ -100,17 +101,48 @@ def calcPhaseResetIdxWin_c(v, phi_j, times, wind_l, wind_r, uc, uc_ind, len_uc):
 
 def getPhaseResetIndices(args):
 
+    cnt = 133
+    y2 = args.channels[cnt,:] ## singled_out_filtered_notched[cnt, :]
+    show_signal(y2)
     # insta_phase_norm = calcInstaPhaseNorm(y2)
     # show_signal(insta_phase_norm)
     # coeffs = calcPhaseResetIdx(1, stims, insta_phase_norm)
     # coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 100).
     # y2 = y1 ## cz #!!!! omit later
     insta_phase_norm = calcInstaPhaseNorm(y2)
+    # show_phases(insta_phase_norm)
 
     #    show_insta_phase(insta_phase_norm)
-    coeffswin = calcPhaseResetIdxWin(1, stims, insta_phase_norm, 100, 1000)
+    coeffswin = calcPhaseResetIdxWin(1, args.times, insta_phase_norm, args.win_l, args.win_r)
     show_signal(coeffswin)
-    coeffswin = calcPhaseResetIdxWin_c(1, insta_phase_norm, stims, 100, 1000, uc, uc_ind, len_uc)
-    show_csignals(coeffswin, output_dir, cnt)
+    coeffswin = calcPhaseResetIdxWin_c(1, insta_phase_norm, args.times, args.win_l, args.win_r, args.uc, args.uc_ind, args.len_uc)
+    show_csignals(coeffswin, args.output_dir, cnt)
 
     return args
+
+
+def histogram_phases(insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
+    wind_ = np.zeros([len(times), wind_l + wind_r])
+    for cnti, i in enumerate(times):
+        i1 = i[0].astype(int)
+        wind_[cnti, :] = insta_phases[i1[0] - wind_l: i1[0] + wind_r]  # faster
+
+    # print(len_uc)
+    nbin = 100
+    hist_wind = np.zeros([len_uc, nbin, wind_l + wind_r])
+
+
+    for i, uclass in enumerate(uc):
+        ind = (uc_ind == i)
+        temp = wind_[ind, :]
+        print(temp.shape[0])
+        for cnti in range(temp.shape[1]):
+            test = np.histogram(temp[:, cnti], nbin, (0, 1)) # calc hist wind_[ind, :]
+            hist_wind[i, :, cnti] = test[0]
+        stop = 1
+
+    testimage = np.squeeze(hist_wind[1, :, :])
+    #testimage = testimage[-1:0:-1,:]
+    plt.imshow(testimage)
+    plt.show()
+    return hist_wind

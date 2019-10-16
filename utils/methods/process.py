@@ -4,6 +4,7 @@ from utils.methods.fouriers import power_spectrum_fft
 from utils.disp.showphases import showFFT, show_signal
 import seaborn as sns
 import matplotlib.pyplot as plt
+from utils.methods.n1p1 import rerefAll
 
 
 def magnospec(signal, fs):
@@ -56,9 +57,9 @@ def proc(args):
         # move this before the loop, take care, once you calc, then in the loop you take it out
         # re - referencing change to spatial
         # czr = reref(cz, channels)
-        if do_rereferencing:
-            meanref = rerefAll(args.channels)
-            args.singled_out[cnt, :] -= meanref
+        if args.do_rereferencing:
+            meanref = rerefAll(args.singled_out)
+            args.singled_out -= meanref
                 # show_signal(singled_out)
 
         # magnospec
@@ -106,8 +107,8 @@ def proc(args):
             # show_signal(y2)
             # magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
 
-        p1, xf = power_spectrum_fft(args.singled_out_filtered_notched[cnt, :], args.fs)
-        showFFT(p1, xf)
+        # p1, xf = power_spectrum_fft(args.singled_out_filtered_notched[cnt, :], args.fs)
+        # showFFT(p1, xf)
         stop = 1
 
     return args

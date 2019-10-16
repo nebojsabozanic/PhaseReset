@@ -55,6 +55,9 @@ def rerefAll(all):
 
 def getN1P1(args):
 
+    # args.ave_wind_all = np.zeros([args.channels.shape[0], args.len_uc, args.win_l + args.win_r])
+    # args.std_wind_all = np.zeros([args.channels.shape[0], args.len_uc, args.win_l + args.win_r])
+
     for cnt in range(args.channels.shape[0]):
         signal = args.singled_out_filtered_notched[cnt,:]
         wind_ = np.zeros([len(args.times), args.win_l + args.win_r])
@@ -73,9 +76,12 @@ def getN1P1(args):
             ave_wind[i, :] = np.mean(wind_[ind, :], 0)
             std_wind[i, :] = np.std(wind_[ind, :], 0)
 
+        # args.ave_wind_all[cnt, :, :] = ave_wind
+        # args.std_wind_all[cnt, :, :] = std_wind
+
         show_csignals(ave_wind, args.output_dir, cnt)
 
-    return 0
+    return args
 
 # ave_y2_500, std_y2_500, ave_y2_1000, std_y2_1000 = n1p1(y2, stims, 400, 2000)
 # ave_y2, std_y2 = n1p1c(y2, stims, 100, 1000, uc, uc_ind, len_uc)
