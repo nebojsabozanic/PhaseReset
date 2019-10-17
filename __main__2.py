@@ -75,8 +75,8 @@ def main(args):
     # read real or generate surrogate data
     args = readchannels(args)
 
-    if(1):
-        args.stims[0, 102:] = 'stan2'
+    #if(1):
+    #    args.stims[0, 102:] = 'stan2'
     fs = args.fs
     print(fs)
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
@@ -88,14 +88,13 @@ def main(args):
         cz = args.channels[cnt, :]
         #if (len(cz) % 2):
             #cz = cz[:-1]
-        cz = cz[:-37]
         fst1 = 1000.
         t = np.arange(0, len(cz)/fst1, 1/fst1)
         lent1 = 1347
         t1 = np.arange(0, lent1 / fst1, 1 / fst1)
-        lmbd = 0
+        lmbd = 8
         test = np.exp(-lmbd * t1)
-        test1 = 0.55*np.sin(2 * np.pi * 17 * t1)
+        test1 = 0.55*np.sin(2 * np.pi * 27 * t1)
         test2 = test1*test
         show_signal(test2)
         phase0 = np.zeros(len(cz))
@@ -104,16 +103,20 @@ def main(args):
         phase = phase0
         cz1 = np.zeros(len(cz))
         cz0 = np.zeros(len(cz))
+        curious = np.zeros(len(cz))
         times = args.stims[1, 2:]
-        temp0 = 0
-        temps = np.zeros(1)
         for cnt, i in enumerate(times):
             temp = i[0].astype(int)
-            temps = np.append(temps, temp)
-            temp0 += 3126
-            if cnt < 100:
-                cz0[temp[0]:temp[0] + lent1] = test2[0:lent1]
-            jitter = 0 # random.randint(1, 60) - 30
+            # temps = np.append(temps, temp)
+            #temp0 += 2000 + random.randint(-314, 314)# 3126
+            temp0 = temp[0] + 0 #+ random.randint(-314, 314)
+            times[cnt] = temp0
+            args.stims[1, 2+cnt] = temp0
+            print(temp0)
+            jitter = random.randint(1, 4) - 2
+            if 1:  # cnt < 100:
+                cz0[temp0+jitter:temp0 +jitter+ lent1] = test2[0:lent1]
+                curious[temp0] = 1
             # phase[temp[0]+jitter:temp[0]+jitter+2000] = test
             cz1[temp[0]+jitter:temp[0]+jitter+lent1] = test2[0:lent1]
         # phase = np.cumsum(phaseR)
@@ -121,27 +124,30 @@ def main(args):
         #show_signal(cz1)
 #        cz = np.sin(2 * np.pi * 13 * t + phase)
         print('cz0')
-        diftimes = np.diff(temps)
+        diftimes = np.diff(times)
         f_diftimes = 1./diftimes
-        show_signal(cz0)
-        P1, xf = power_spectrum_fft(cz0, fst1)
+        #show_signal(curious)
+        P1, xf = power_spectrum_fft(curious, fst1)
         # P1m = 20 * np.log10(P1 / max(P1))
         showFFT(P1, xf)
-        #noise = 0.03*np.random.randn(1, len(t))
+        noise = 0.01*np.random.randn(1, len(t))
 
-        #cz1 += noise[0]
+        cz0 += noise[0]
 
-        cz = cz1
-        show_signal(cz1)
+        surro = 1
 
-        args.times = temps
-        args = getStats(args)
+        if surro:
+            cz = cz0
+        # show_signal(cz1)
+
+        #args.times = temps
+        # args = getStats(args)
 
         # re - referencing
         #czr = reref(cz, channels)
 
         czr = cz
-        if (0):
+        if (1-surro):
             meanref = rerefAll(args.channels)
             czr = cz - meanref
             #show_signal(czr)
@@ -164,7 +170,7 @@ def main(args):
         cutoff = 3.667
         show_signal(czr)
         # y1 = butter_filter(czr, cutoff, fs, order)
-        # y1 = butter_bandpass(czr, 100, 200, fs, order)
+        #y1 = butter_bandpass(czr, 3, 100, fs, order)
         y1 = czr
 
         print('sad')
@@ -185,14 +191,30 @@ def main(args):
                 # showFFT(P1m, xf)
             else:
                 # show_signal(y1)
-                y2 = Implement_Notch_Filter(1000., 0.25, 60., 5., 3, 'butter', y1)
+                y2 = Implement_Notch_Filter(1000., 1, 60., 5., 3, 'butter', y1)
+                y2 = Implement_Notch_Filter(1000., 1, 120., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 180., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 240., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 300., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 360., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 420., 5., 3, 'butter',y2)
+                y2 = Implement_Notch_Filter(1000., 1, 480., 5., 3, 'butter',y2)
 
             show_signal(y2)
-            # P1, xf = calcFFT(y2, fs)
+            P1, xf = power_spectrum_fft(y2, fs)
             # P1m = 20 * np.log10(P1 / max(P1))
-            # showFFT(P1m, xf)
+            showFFT(P1, xf)
         else:
             y2 = y1
+
+        order = 5
+
+        #5 24 - 13
+        y2 = butter_bandpass(y2, 5, 17, fs, order)
+        P1, xf = power_spectrum_fft(y2, fs)
+        # P1m = 20 * np.log10(P1 / max(P1))
+        showFFT(P1, xf)
+        show_signal(y2)
 
         # insta_phase_norm = calcInstaPhaseNorm(y2)
         # show_signal(insta_phase_norm)

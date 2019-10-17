@@ -5,7 +5,7 @@ def readchannels(args):
 
     # 1 Tina Session 1
     # filename = 'data/Tina 10-8-19 round 2 1_20191008_062255'
-    # #channel_name = 'Tina10819round21_20191008_062255mff2'
+    # channel_name = 'Tina10819round21_20191008_062255mff2'
 
     # 5. Nebo click no less
     # filename = 'data/1_20191011_044342 nebo loud clicks.mat'

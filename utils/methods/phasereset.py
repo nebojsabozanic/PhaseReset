@@ -124,8 +124,10 @@ def getPhaseResetIndices(args):
 def histogram_phases(insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
     wind_ = np.zeros([len(times), wind_l + wind_r])
     for cnti, i in enumerate(times):
-        i1 = i[0].astype(int)
-        wind_[cnti, :] = insta_phases[i1[0] - wind_l: i1[0] + wind_r]  # faster
+        #i1 = i[0].astype(int)
+        i1 = int(i)
+        # wind_[cnti, :] = insta_phases[i1[0] - wind_l: i1[0] + wind_r]  # faster
+        wind_[cnti, :] = insta_phases[i1 - wind_l: i1 + wind_r]  # faster
 
     # print(len_uc)
     nbin = 100
@@ -141,7 +143,9 @@ def histogram_phases(insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
             hist_wind[i, :, cnti] = test[0]
         stop = 1
 
-    testimage = np.squeeze(hist_wind[1, :, :])
+    testimage = np.squeeze(hist_wind[0, :, :])
+    print('max')
+    print(np.max(testimage))
     #testimage = testimage[-1:0:-1,:]
     plt.imshow(testimage)
     plt.show()

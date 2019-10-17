@@ -22,8 +22,8 @@ def n1p1c(signal, times, wind_l, wind_r, uc, uc_ind, len_uc):
     wind_ = np.zeros([len(times), wind_l + wind_r])
     for cnti, i in enumerate(times):
 
-        i1 = i[0].astype(int)
-        wind_[cnti, :] = signal[i1[0] - wind_l : i1[0] + wind_r] # faster
+        i1 = i #i[0].astype(int)
+        wind_[cnti, :] = signal[i1 - wind_l : i1 + wind_r] # faster # signal[i1[0] - wind_l : i1[0] + wind_r] # faster
 
     #print(len_uc)
     ave_wind = np.zeros([len_uc, wind_l + wind_r])
