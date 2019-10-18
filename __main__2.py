@@ -89,12 +89,19 @@ def main(args):
         #if (len(cz) % 2):
             #cz = cz[:-1]
         fst1 = 1000.
+        freq = 7
         t = np.arange(0, len(cz)/fst1, 1/fst1)
         lent1 = 1347
         t1 = np.arange(0, lent1 / fst1, 1 / fst1)
-        lmbd = 8
+        #lmbd3 = 1
+        #test3 = np.exp(-lmbd3 * t1)
+        lmbd = 9
         test = np.exp(-lmbd * t1)
-        test1 = 0.55*np.sin(2 * np.pi * 27 * t1)
+        #shift_test = test
+        test[0:int(2/freq*fst1)] *= .3
+        test[0:int(1/freq*fst1)] *= .1
+        test1 = 0.55*np.sin(2 * np.pi * freq * t1)
+        #test2 = test1*test3[::-1]
         test2 = test1*test
         show_signal(test2)
         phase0 = np.zeros(len(cz))
