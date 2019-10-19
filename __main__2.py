@@ -95,11 +95,13 @@ def main(args):
         t1 = np.arange(0, lent1 / fst1, 1 / fst1)
         #lmbd3 = 1
         #test3 = np.exp(-lmbd3 * t1)
-        lmbd = 9
+        lmbd = 5
         test = np.exp(-lmbd * t1)
         #shift_test = test
-        test[0:int(2/freq*fst1)] *= .3
-        test[0:int(1/freq*fst1)] *= .1
+        #test[0:int(2/freq*fst1)] *= .3
+        #test[0:int(1.5/ freq * fst1)] *= .3
+        #test[0:int(1/freq*fst1)] *= .3
+        #test[0:int(.5 / freq * fst1)] *= .3
         test1 = 0.55*np.sin(2 * np.pi * freq * t1)
         #test2 = test1*test3[::-1]
         test2 = test1*test
@@ -114,13 +116,14 @@ def main(args):
         times = args.stims[1, 2:]
         for cnt, i in enumerate(times):
             temp = i[0].astype(int)
+            temp0 = temp[0]
             # temps = np.append(temps, temp)
             #temp0 += 2000 + random.randint(-314, 314)# 3126
-            temp0 = temp[0] + 0 #+ random.randint(-314, 314)
+            #temp0 = temp[0] + random.randint(-314, 314)
             times[cnt] = temp0
-            args.stims[1, 2+cnt] = temp0
+            #args.stims[1, 2+cnt] = temp0
             print(temp0)
-            jitter = random.randint(1, 4) - 2
+            jitter = random.randint(1, 20) - 10
             if 1:  # cnt < 100:
                 cz0[temp0+jitter:temp0 +jitter+ lent1] = test2[0:lent1]
                 curious[temp0] = 1
@@ -131,17 +134,19 @@ def main(args):
         #show_signal(cz1)
 #        cz = np.sin(2 * np.pi * 13 * t + phase)
         print('cz0')
-        diftimes = np.diff(times)
-        f_diftimes = 1./diftimes
+        diftimes = np.diff(args.stims[1, 2:])
+        #un = np.unique(diftimes)
+        #un_srtd = np.sort(un)
+        #f_diftimes = 1./diftimes
         #show_signal(curious)
         P1, xf = power_spectrum_fft(curious, fst1)
         # P1m = 20 * np.log10(P1 / max(P1))
         showFFT(P1, xf)
-        noise = 0.01*np.random.randn(1, len(t))
+        noise = 0.2*np.random.randn(1, len(t))
 
         cz0 += noise[0]
 
-        surro = 1
+        surro = 0
 
         if surro:
             cz = cz0
@@ -174,11 +179,11 @@ def main(args):
 
         # # notc
         order = 5
-        cutoff = 3.667
+        cutoff = 3
         show_signal(czr)
-        # y1 = butter_filter(czr, cutoff, fs, order)
+        y1 = butter_filter(czr, cutoff, fs, order)
         #y1 = butter_bandpass(czr, 3, 100, fs, order)
-        y1 = czr
+        #y1 = czr
 
         print('sad')
         show_signal(y1)
@@ -186,7 +191,7 @@ def main(args):
         # P1m = 20 * np.log10(P1 / max(P1))
         showFFT(P1, xf)
 
-        if(0):
+        if(1):
             if (0):
                 f0 = 60.
                 Q = 10.
@@ -214,10 +219,11 @@ def main(args):
         else:
             y2 = y1
 
-        order = 5
+        order = 3
 
         #5 24 - 13
-        y2 = butter_bandpass(y2, 5, 17, fs, order)
+        #y2 = butter_bandpass(y2, 60, 90, fs, order)
+        #y2 = butter_filter(y2, 90, fs, order)
         P1, xf = power_spectrum_fft(y2, fs)
         # P1m = 20 * np.log10(P1 / max(P1))
         showFFT(P1, xf)

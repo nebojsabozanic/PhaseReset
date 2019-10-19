@@ -147,6 +147,7 @@ def histogram_phases(insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
     print('max')
     print(np.max(testimage))
     #testimage = testimage[-1:0:-1,:]
+    plt.title(np.max(testimage))
     plt.imshow(testimage)
     plt.show()
     return hist_wind

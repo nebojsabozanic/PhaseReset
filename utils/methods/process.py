@@ -155,10 +155,11 @@ def getStats(args):
 
     sns.set(color_codes=True)
     args.der = np.diff(args.times)
+    args.der = np.delete(args.der, args.der > 3)
     args.ave_der = np.mean(args.der)
     args.std_der = np.std(args.der)
     sns.distplot(args.der, hist=False, rug=True)
-    # plt.show()
+    plt.show()
     plt.savefig('soa_distribution.png')
     plt.close()
     stop = 1

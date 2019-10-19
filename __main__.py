@@ -74,11 +74,12 @@ def main(args):
     args = readchannels(args)
 
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
-    start = time.time()
-    args = proc(args)
-    print(time.time() - start)
+    #start = time.time()
+    #args = proc(args)
+    #print(time.time() - start)
 
-    # args = getStats(args) # put in output
+    args.times = args.stims[1, 2:]
+    args = getStats(args) # put in output
 
     # args = getN1P1(args)
 
