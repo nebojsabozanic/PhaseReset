@@ -135,7 +135,11 @@ def getStats(args):
 
     sns.set(color_codes=True)
     args.der = np.diff(args.times)
+<<<<<<< HEAD
     args.der = args.der[args.der < 5000]
+=======
+    args.der = np.delete(args.der, args.der > 3)
+>>>>>>> 28bbc8dc0e0bc4ea52b87633db646193f30739fd
     args.ave_der = np.mean(args.der)
     args.std_der = np.std(args.der)
     sns.distplot(args.der, hist=False, rug=True)

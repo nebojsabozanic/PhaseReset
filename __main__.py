@@ -79,11 +79,12 @@ def main(args):
     write_arguments_to_file(args, os.path.join(log_dir, 'arguments.txt'))
 
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
-    start = time.time()
-    args = proc(args)
-    print(time.time() - start)
+    #start = time.time()
+    #args = proc(args)
+    #print(time.time() - start)
 
-    # args = getStats(args) # put in output
+    args.times = args.stims[1, 2:]
+    args = getStats(args) # put in output
 
     args.times = args.times_truth
     # add a progress bar
