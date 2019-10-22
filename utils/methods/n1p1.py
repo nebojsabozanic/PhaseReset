@@ -1,6 +1,5 @@
 import numpy as np
-from utils.disp.showphases import show_csignals
-
+from utils.disp.showphases import show_csignals, show_signal, magnospec
 
 def n1p1(signal, times, wind_l, wind_r):
 
@@ -60,10 +59,16 @@ def getN1P1(args):
 
     for cnt in range(args.channels.shape[0]):
         signal = args.singled_out_filtered_notched[cnt,:]
-        wind_ = np.zeros([len(args.times), args.win_l + args.win_r])
-        for cnti, i in enumerate(args.times):
-            i1 = i[0].astype(int)
-            wind_[cnti, :] = signal[i1[0] - args.win_l: i1[0] + args.win_r]  # faster
+        # show_signal(signal)
+        # magnospec(signal, args.fs)
+        # len(args.times) fix
+        wind_ = np.zeros([650, args.win_l + args.win_r])
+        for cnti, i in enumerate(args.times[0]):
+            i1 = i #i[0].astype(int)
+            # wind_[cnti, :] = signal[i1[0] - args.win_l: i1[0] + args.win_r]  # faster
+            wind_[cnti, :] = signal[i1 - args.win_l: i1 + args.win_r]  # faster
+        #!!!! fix times in both read and surro
+
 
         # print(len_uc)
         ave_wind = np.zeros([args.len_uc, args.win_l + args.win_r])

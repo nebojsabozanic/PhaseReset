@@ -1,37 +1,30 @@
 import numpy as np
 from scipy import signal
 from utils.methods.fouriers import power_spectrum_fft
-from utils.disp.showphases import showFFT, show_signal
+from utils.disp.showphases import showFFT, show_signal, magnospec
 import seaborn as sns
 import matplotlib.pyplot as plt
 from utils.methods.n1p1 import rerefAll
 
 
-def magnospec(signal, fs):
-
-    p1, xf = power_spectrum_fft(signal, fs)
-    p1m = 20 * np.log10(p1 / max(p1))
-    showFFT(p1m, xf)
-    return 0
-
-
 def proc(args):
 
     if args.if_data_large:
-        args.channels = args.channels[:, :10000]
+        args.channels = args.channels[:, :args.duration]
 
     if len(args.channels[0, :]) % 2:
         args.singled_out = args.channels[:, :-1]  # potentially to all    args.singled_out_filtered = args.channels;
     else:
         args.singled_out = args.channels
-    args.singled_out_filtered = args.singled_out
-    args.singled_out_filtered_notched = args.singled_out
+
+#    show_signal(args.singled_out[0, :])
+    # delete 0?
+    if (1):
+        args.singled_out = args.singled_out[:, :-36]
+    # for cnt in range(args.channels.shape[0]):
+    #    test = args.channels[cnt, np.abs(args.channels[cnt, :]) < 1]
 
     args.classes = args.stims[0, 2:]
-
-    # mostly for debugging
-    if_data_large = 0
-    do_rereferencing = 0
 
     args.times = args.stims[1, 2:]
 
@@ -44,47 +37,39 @@ def proc(args):
     args.uc, args.uc_ind = np.unique(args.classes, return_inverse=True)
     args.len_uc = len(args.uc)
 
+    # move this before the loop, take care, once you calc, then in the loop you take it out
+    # re - referencing change to spatial
+    # czr = reref(cz, channels)
+    if args.do_reref:
+        meanref = rerefAll(args.singled_out)
+        args.singled_out -= meanref
+        # show_signal(singled_out)
+
+    args.singled_out_filtered = args.singled_out
+    args.singled_out_filtered_notched = args.singled_out_filtered
+
     for cnt in range(args.channels.shape[0]):
 
-        # args.singled_out = args.channels[cnt, :]
+        # magnospec(args.singled_out[cnt, :], args.fs)
 
-        # show_signal(args.singled_out)
+        # show_signal(args.singled_out[cnt, :])
 
-        # move this before the loop
-        if if_data_large:
-            args.singled_out[cnt, :] = args.singled_out[0:dur]
+        # show_signal(args.singled_out[cnt, :])
 
-        # move this before the loop, take care, once you calc, then in the loop you take it out
-        # re - referencing change to spatial
-        # czr = reref(cz, channels)
-        if args.do_rereferencing:
-            meanref = rerefAll(args.singled_out)
-            args.singled_out -= meanref
-                # show_signal(singled_out)
-
-        # magnospec
-        # tf = calc_stft(args.singled_out)
-        # show_tf(tf)
-        # show_windows(cz, stims, fs)
-
-        # # notc
-        order = 6
+        order = 5
         cutoff = 3.667
         args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
 
-        # magnospec(args.singled_out_filtered[cnt, :], args.fs)
+        # show_signal(args.singled_out_filtered[cnt, :])
 
-        #single_channel = args.channels[cnt, :]
+        # magnospec(args.singled_out_filtered[cnt, :], args.fs)
 
         if (0):
             args.f0 = 60.
             args.Q = 10.
             b, a = signal.iirnotch(2 * args.f0 / args.fs, args.Q)
             args.singled_out_filtered_notched[cnt, :] = signal.filtfilt(b, a, args.singled_out_filtered[cnt, :])
-            # show_signal(y2)
-            # magnospec(y2)
         else:
-            # show_signal(y1)
             # no hard coded!!!
             args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 60., 5., 3, 'butter',
                                                                                args.singled_out_filtered[cnt, :])
@@ -103,13 +88,8 @@ def proc(args):
             args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
                                                                                args.singled_out_filtered[cnt, :])
 
-
-            # show_signal(y2)
-            # magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
-
-        # p1, xf = power_spectrum_fft(args.singled_out_filtered_notched[cnt, :], args.fs)
-        # showFFT(p1, xf)
-        stop = 1
+        # show_signal(args.singled_out_filtered[cnt, :])
+        # magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
 
     return args
 
@@ -155,10 +135,11 @@ def getStats(args):
 
     sns.set(color_codes=True)
     args.der = np.diff(args.times)
+    args.der = args.der[args.der < 5000]
     args.ave_der = np.mean(args.der)
     args.std_der = np.std(args.der)
     sns.distplot(args.der, hist=False, rug=True)
-    # plt.show()
+    plt.show()
     plt.savefig('soa_distribution.png')
     plt.close()
     stop = 1
@@ -171,3 +152,13 @@ def getStats(args):
 # print(len(temp))
 # show_signal(ave_y2_500)
 # show_signal(temp)
+
+
+def ideally():
+
+    # reref
+    # filter lp
+    # notch
+    # ...
+
+    return 0

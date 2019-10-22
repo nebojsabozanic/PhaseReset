@@ -231,3 +231,10 @@ def showphases(step3):
     plt.close('all')
 
     return 0
+
+def magnospec(signal, fs):
+
+    p1, xf = power_spectrum_fft(signal, fs)
+    #p1m = 20 * np.log10(p1 / max(p1))
+    showFFT(p1, xf)
+    return 0

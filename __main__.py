@@ -33,7 +33,7 @@ import argparse
 
 from six import iteritems
 from subprocess import Popen, PIPE
-from utils.io.read import readchannels
+from utils.io.read import readchannels, surro
 from utils.methods.phasereset import getPhaseResetIndices #calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
 # from utils.methods.fouriers import calcFFT
 from utils.methods.n1p1 import getN1P1  # n1p1, rerefAll, n1p1c
@@ -58,9 +58,6 @@ def main(args):
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
         os.makedirs(log_dir)
 
-    # Write arguments to a text file
-    write_arguments_to_file(args, os.path.join(log_dir, 'arguments.txt'))
-
     # Store some git revision info in a text file in the log directory
     src_path, _ = os.path.split(os.path.realpath(__file__))
     # store_revision_info(src_path, log_dir, ' '.join(sys.argv))
@@ -71,7 +68,15 @@ def main(args):
     args.output_dir = output_dir
 
     # read real or generate surrogate data
-    args = readchannels(args)
+    # solve this issue
+    args = readchannels(args)  #
+    if args.surro:
+        args.times = args.stims[1, 2:]  #
+        args = surro(args)
+
+
+    # Write arguments to a text file
+    write_arguments_to_file(args, os.path.join(log_dir, 'arguments.txt'))
 
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
     start = time.time()
@@ -80,7 +85,11 @@ def main(args):
 
     # args = getStats(args) # put in output
 
-    # args = getN1P1(args)
+    args.times = args.times_truth
+    # add a progress bar
+    args = getN1P1(args)
+
+    args = getStats(args) # put in output
 
     # show_examples(args)
 
@@ -125,33 +134,47 @@ def write_arguments_to_file(args, filename):
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--experiment', type=str,
+                        help='Experiment name', default='')
+
+    parser.add_argument('--channel_name', type=str,
+                        help='Experiment name', default='')
+
     parser.add_argument('--logs_base_dir', type=str,
                         help='Directory where to write event logs.', default='log')
     parser.add_argument('--output_base_dir', type=str,
                         help='Directory where to write output images.', default='output')
 
-    parser.add_argument('--methods', type=list,
-                        help='which methods are applied', default=['phase reset'])
-
-    parser.add_argument('--data_path', type=str,
-                        help='Folder and files that will be analyzed', default=os.path.join('data', 'data1.mat'))
-
-    parser.add_argument('--freq_lim', type=float,
-                        help='for a more pleasent display', default=300)
-
     parser.add_argument('--win_l', type=int,
                         help='left part of the window', default=100)
     parser.add_argument('--win_r', type=int,
                         help='left part of the window', default=900)
-
     parser.add_argument('--if_data_large', type=bool,
                         help='if the memory is not large enough', default=0)
-
     parser.add_argument('--dur', type=int,
                         help='duation in case the memory is not too large', default=10000)
 
-    parser.add_argument('--do_rereferencing', type=bool,
+    parser.add_argument('--do_reref', type=bool,
                         help='average rereferencing', default=1)
+
+    parser.add_argument('--surro', type=bool,
+                        help='generate artificial data', default=0)
+
+    parser.add_argument('--sfs', type=float,
+                        help='surro sampling frequency', default=1e3)
+    parser.add_argument('--erp_len', type=int,
+                        help='duration of erp fingerprint in samples', default=1347)
+    parser.add_argument('--lambd', type=float,
+                        help='exponential decay parameter (strength)', default=9.)
+    parser.add_argument('--erp_freq', type=float,
+                        help='Frequency of the erp', default=7.)
+    parser.add_argument('--signal_len', type=int,
+                        help='generate artificial data', default=5e5)
+    parser.add_argument('--jit', type=int,
+                        help='generate artificial data', default=2)
+    parser.add_argument('--noise_amp', type=float,
+                        help='generate artificial data', default=0.2)
+
 
     return parser.parse_args(argv)
 
