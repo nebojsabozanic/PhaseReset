@@ -99,8 +99,8 @@ def show_csignals(signal, output_dir, cnt):  # , t, output_dir, filename, axisna
     for cnt1 in range(0, signal.shape[0]):
         filename = str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
         plt.plot(t, signal[cnt1, :])  # t,
-        #plt.show()
-        #plt.waitforbuttonpress(0.1)
+        plt.show()
+        plt.waitforbuttonpress(0.1)
         plt.savefig(os.path.join(output_dir, filename))
         plt.close()
     #plt.ylim(-6, 6)

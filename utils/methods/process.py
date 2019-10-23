@@ -5,28 +5,26 @@ from utils.disp.showphases import showFFT, show_signal, magnospec
 import seaborn as sns
 import matplotlib.pyplot as plt
 from utils.methods.n1p1 import rerefAll
+import os
 
 
 def proc(args):
 
-    if args.if_data_large:
-        args.channels = args.channels[:, :args.duration]
-
-    if len(args.channels[0, :]) % 2:
-        args.singled_out = args.channels[:, :-1]  # potentially to all    args.singled_out_filtered = args.channels;
-    else:
-        args.singled_out = args.channels
-
-#    show_signal(args.singled_out[0, :])
+    args.singled_out = args.channels
+    # show_signal(args.singled_out[0, :])
     # delete 0?
     if (1):
         args.singled_out = args.singled_out[:, :-36]
     # for cnt in range(args.channels.shape[0]):
     #    test = args.channels[cnt, np.abs(args.channels[cnt, :]) < 1]
 
-    args.classes = args.stims[0, 2:]
+    if args.if_data_large:
+        args.singled_out = args.singled_out[:, :args.duration]
 
-    args.times = args.stims[1, 2:]
+    if len(args.channels[0, :]) % 2:
+        args.singled_out = args.singled_out[:, :-1]  # potentially to all    args.singled_out_filtered = args.channels;
+
+    args.classes = args.stims[0, 2:]
 
     if args.if_data_large:
         dur1 = args.dur - args.win_r
@@ -37,59 +35,68 @@ def proc(args):
     args.uc, args.uc_ind = np.unique(args.classes, return_inverse=True)
     args.len_uc = len(args.uc)
 
-    # move this before the loop, take care, once you calc, then in the loop you take it out
-    # re - referencing change to spatial
-    # czr = reref(cz, channels)
-    if args.do_reref:
-        meanref = rerefAll(args.singled_out)
-        args.singled_out -= meanref
-        # show_signal(singled_out)
+    if not args.surro:
 
-    args.singled_out_filtered = args.singled_out
-    args.singled_out_filtered_notched = args.singled_out_filtered
+        # move this before the loop, take care, once you calc, then in the loop you take it out
+        # re - referencing change to spatial
+        # czr = reref(cz, channels)
+        if args.do_reref:
+            meanref = rerefAll(args.singled_out)
+            args.singled_out -= meanref
+            # show_signal(singled_out)
 
-    for cnt in range(args.channels.shape[0]):
+        args.singled_out_filtered = args.singled_out
+        args.singled_out_filtered_notched = args.singled_out_filtered
 
-        # magnospec(args.singled_out[cnt, :], args.fs)
+        for cnt in range(args.channels.shape[0]):
 
-        # show_signal(args.singled_out[cnt, :])
+            show_midplots = 1
 
-        # show_signal(args.singled_out[cnt, :])
+            if show_midplots:
+                print('channel raw')
+                show_signal(args.singled_out[cnt, :])
+                magnospec(args.singled_out[cnt, :], args.fs)
 
-        order = 5
-        cutoff = 3.667
-        args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
+            order = 5
+            cutoff = 3.667
+            args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
 
-        # show_signal(args.singled_out_filtered[cnt, :])
+            if show_midplots:
+                print('filtered')
+                show_signal(args.singled_out_filtered[cnt, :])
+                magnospec(args.singled_out_filtered[cnt, :], args.fs)
 
-        # magnospec(args.singled_out_filtered[cnt, :], args.fs)
+            if (0):
+                args.f0 = 60.
+                args.Q = 10.
+                b, a = signal.iirnotch(2 * args.f0 / args.fs, args.Q)
+                args.singled_out_filtered_notched[cnt, :] = signal.filtfilt(b, a, args.singled_out_filtered[cnt, :])
+            else:
+                # no hard coded!!!
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 60., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 120., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 180., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 240., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 300., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 360., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 420., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
+                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
+                                                                                   args.singled_out_filtered[cnt, :])
 
-        if (0):
-            args.f0 = 60.
-            args.Q = 10.
-            b, a = signal.iirnotch(2 * args.f0 / args.fs, args.Q)
-            args.singled_out_filtered_notched[cnt, :] = signal.filtfilt(b, a, args.singled_out_filtered[cnt, :])
-        else:
-            # no hard coded!!!
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 60., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 120., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 180., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 240., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 300., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 360., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 420., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-            args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
-                                                                               args.singled_out_filtered[cnt, :])
-
-        # show_signal(args.singled_out_filtered[cnt, :])
-        # magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
+            if show_midplots:
+                print('notched')
+                show_signal(args.singled_out_filtered[cnt, :])
+                magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
+    else:
+        args.singled_out_filtered = args.singled_out
+        args.singled_out_filtered_notched = args.singled_out
 
     return args
 
@@ -135,16 +142,13 @@ def getStats(args):
 
     sns.set(color_codes=True)
     args.der = np.diff(args.times)
-<<<<<<< HEAD
-    args.der = args.der[args.der < 5000]
-=======
-    args.der = np.delete(args.der, args.der > 3)
->>>>>>> 28bbc8dc0e0bc4ea52b87633db646193f30739fd
+    # args.der = args.der[args.der < 5000]
+    # args.der = np.delete(args.der, args.der > 3)
     args.ave_der = np.mean(args.der)
     args.std_der = np.std(args.der)
     sns.distplot(args.der, hist=False, rug=True)
     plt.show()
-    plt.savefig('soa_distribution.png')
+    plt.savefig(os.path.join(args.output_dir, 'soa_distribution.png'))
     plt.close()
     stop = 1
 

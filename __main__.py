@@ -71,7 +71,6 @@ def main(args):
     # solve this issue
     args = readchannels(args)  #
     if args.surro:
-        args.times = args.stims[1, 2:]  #
         args = surro(args)
 
 
@@ -79,18 +78,15 @@ def main(args):
     write_arguments_to_file(args, os.path.join(log_dir, 'arguments.txt'))
 
     # clean the data, and filter (highpass, lowwpass, notch, eyeblinks, eyemovements, headmovements...)
-    #start = time.time()
-    #args = proc(args)
-    #print(time.time() - start)
+    start = time.time()
+    args = proc(args)
+    print(time.time() - start)
 
-    args.times = args.stims[1, 2:]
+    # args.times = args.stims[1, 2:]
     args = getStats(args) # put in output
 
-    args.times = args.times_truth
     # add a progress bar
     args = getN1P1(args)
-
-    args = getStats(args) # put in output
 
     # show_examples(args)
 
@@ -159,7 +155,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=0)
+                        help='generate artificial data', default=1)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)

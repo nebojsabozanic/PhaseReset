@@ -112,7 +112,7 @@ def getPhaseResetIndices(args):
     insta_phase_norm = calcInstaPhaseNorm(y2)
     # show_phases(insta_phase_norm)
 
-    #    show_insta_phase(insta_phase_norm)
+    # show_insta_phase(insta_phase_norm)
     coeffswin = calcPhaseResetIdxWin(1, args.times, insta_phase_norm, args.win_l, args.win_r)
     show_signal(coeffswin)
     coeffswin = calcPhaseResetIdxWin_c(1, insta_phase_norm, args.times, args.win_l, args.win_r, args.uc, args.uc_ind, args.len_uc)

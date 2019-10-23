@@ -61,12 +61,11 @@ def getN1P1(args):
         signal = args.singled_out_filtered_notched[cnt,:]
         # show_signal(signal)
         # magnospec(signal, args.fs)
-        # len(args.times) fix
-        wind_ = np.zeros([650, args.win_l + args.win_r])
-        for cnti, i in enumerate(args.times[0]):
-            i1 = i #i[0].astype(int)
+        # len(args.times) fix 650
+        wind_ = np.zeros([len(args.times), args.win_l + args.win_r])
+        for cnti, i in enumerate(args.times):
             # wind_[cnti, :] = signal[i1[0] - args.win_l: i1[0] + args.win_r]  # faster
-            wind_[cnti, :] = signal[i1 - args.win_l: i1 + args.win_r]  # faster
+            wind_[cnti, :] = signal[i - args.win_l: i + args.win_r]  # faster
         #!!!! fix times in both read and surro
 
 
