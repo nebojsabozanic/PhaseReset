@@ -81,20 +81,20 @@ def proc(args):
                 # no hard coded!!!
                 args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 60., 5., 3, 'butter',
                                                                                    args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 120., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 180., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 240., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 300., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 360., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 420., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 120., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 180., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 240., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 300., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 360., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 420., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
+                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
+                #                                                                   args.singled_out_filtered[cnt, :])
 
             if show_midplots:
                 print('notched')
@@ -104,6 +104,10 @@ def proc(args):
     else:
         args.singled_out_filtered = args.singled_out
         args.singled_out_filtered_notched = args.singled_out
+
+    #low_band = 0.25
+    #high_band = 100
+    #args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], low_band, high_band, args.fs, order)
 
     return args
 

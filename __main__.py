@@ -94,11 +94,7 @@ def main(args):
     # get the instantaneous phases and their phase reset indices
     # args = getPhaseResetIndices(args)
 
-    y2 = args.singled_out_filtered_notched[-1, :]
-    insta_phase_norm = calcInstaPhaseNorm(y2)
-
-    #show_insta_phase(insta_phase_norm)
-    hists = histogram_phases(insta_phase_norm, args.times, 100, 1000, args.uc, args.uc_ind, args.len_uc)
+    args = histogram_phases(args) #.singled_out_filtered_notched, args.times, args.win_l, args.win_l, args.uc, args.uc_ind, args.len_uc)
 
 
 def store_revision_info(src_path, output_dir, arg_string):

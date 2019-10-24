@@ -121,33 +121,44 @@ def getPhaseResetIndices(args):
     return args
 
 
-def histogram_phases(insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
-    wind_ = np.zeros([len(times), wind_l + wind_r])
-    for cnti, i in enumerate(times):
-        #i1 = i[0].astype(int)
-        i1 = int(i)
-        # wind_[cnti, :] = insta_phases[i1[0] - wind_l: i1[0] + wind_r]  # faster
-        wind_[cnti, :] = insta_phases[i1 - wind_l: i1 + wind_r]  # faster
+def histogram_phases(args): #insta_phases, times, wind_l, wind_r, uc, uc_ind, len_uc):
 
-    # print(len_uc)
-    nbin = 100
-    hist_wind = np.zeros([len_uc, nbin, wind_l + wind_r])
+    for cnt_ch in range(args.singled_out_filtered_notched.shape[0]):
+        y2 = args.singled_out_filtered_notched[cnt_ch, :]
+        insta_phase_norm = calcInstaPhaseNorm(y2)
+
+        # show_insta_phase(insta_phase_norm)
+
+        wind_ = np.zeros([len(args.times), args.win_l + args.win_r])
+        for cnti, i in enumerate(args.times):
+            #i1 = i[0].astype(int)
+            i1 = int(i)
+            # wind_[cnti, :] = insta_phases[i1[0] - wind_l: i1[0] + wind_r]  # faster
+            wind_[cnti, :] = insta_phase_norm[i1 - args.win_l: i1 + args.win_r]  # faster
+
+        # phase_reset_here
+
+        # print(len_uc)
+        args.nbin = 100
+        hist_wind = np.zeros([args.len_uc, args.nbin, args.win_l + args.win_r])
 
 
-    for i, uclass in enumerate(uc):
-        ind = (uc_ind == i)
-        temp = wind_[ind, :]
-        print(temp.shape[0])
-        for cnti in range(temp.shape[1]):
-            test = np.histogram(temp[:, cnti], nbin, (0, 1)) # calc hist wind_[ind, :]
-            hist_wind[i, :, cnti] = test[0]
-        stop = 1
+        for i, uclass in enumerate(args.uc):
+            ind = (args.uc_ind == i)
+            temp = wind_[ind, :]
+            print(temp.shape[0])
+            for cnti in range(temp.shape[1]):
+                test = np.histogram(temp[:, cnti], args.nbin, (0, 1)) # calc hist wind_[ind, :]
+                hist_wind[i, :, cnti] = test[0]
+            stop = 1
 
-    testimage = np.squeeze(hist_wind[0, :, :])
-    print('max')
-    print(np.max(testimage))
-    #testimage = testimage[-1:0:-1,:]
-    plt.title(np.max(testimage))
-    plt.imshow(testimage)
-    plt.show()
-    return hist_wind
+        testimage = np.squeeze(hist_wind[0, :, :])
+        print('max')
+        print(np.max(testimage))
+        #testimage = testimage[-1:0:-1,:]
+        plt.title(np.max(testimage))
+        plt.imshow(testimage)
+        plt.show()
+        # save_ call show (methods>disp)
+
+    return args
