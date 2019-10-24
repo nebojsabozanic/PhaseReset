@@ -34,7 +34,7 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels, surro
-from utils.methods.phasereset import getPhaseResetIndices #calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
+from utils.methods.phasereset import calcInstaPhaseNorm, histogram_phases, getPhaseResetIndices #calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
 # from utils.methods.fouriers import calcFFT
 from utils.methods.n1p1 import getN1P1  # n1p1, rerefAll, n1p1c
 # from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals
@@ -42,6 +42,7 @@ from utils.methods.process import proc, getStats
 # from scipy import signal
 import time
 from utils.disp.showphases import show_examples
+import numpy as np
 
 def main(args):
 
@@ -83,7 +84,7 @@ def main(args):
     print(time.time() - start)
 
     # args.times = args.stims[1, 2:]
-    args = getStats(args) # put in output
+    # args = getStats(args) # put in output
 
     # add a progress bar
     args = getN1P1(args)
@@ -91,7 +92,13 @@ def main(args):
     # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
-    args = getPhaseResetIndices(args)
+    # args = getPhaseResetIndices(args)
+
+    y2 = args.singled_out_filtered_notched[-1, :]
+    insta_phase_norm = calcInstaPhaseNorm(y2)
+
+    #show_insta_phase(insta_phase_norm)
+    hists = histogram_phases(insta_phase_norm, args.times, 100, 1000, args.uc, args.uc_ind, args.len_uc)
 
 
 def store_revision_info(src_path, output_dir, arg_string):
@@ -145,7 +152,7 @@ def parse_arguments(argv):
     parser.add_argument('--win_l', type=int,
                         help='left part of the window', default=100)
     parser.add_argument('--win_r', type=int,
-                        help='left part of the window', default=900)
+                        help='left part of the window', default=2000)
     parser.add_argument('--if_data_large', type=bool,
                         help='if the memory is not large enough', default=0)
     parser.add_argument('--dur', type=int,
@@ -155,7 +162,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=1)
+                        help='generate artificial data', default=0)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)
@@ -172,6 +179,12 @@ def parse_arguments(argv):
     parser.add_argument('--noise_amp', type=float,
                         help='generate artificial data', default=0.2)
 
+    parser.add_argument('--select_ch', type=int,
+                        help='select which channels are going to be used for rereferencing and the analysis',
+                        default=np.array([2, 5, 10, 12, 15, 18, 21, 24, 26, 29, 34, 36, 37, 42, 44, 46, 47, 48, 49, 59,
+                                          62, 64, 66, 67, 68, 69, 76, 79, 81,   84, 86, 87, 88, 94, 96, 97, 101, 106,
+                                          109, 116, 119, 126, 140, 142, 143, 150, 153, 161, 162, 164, 169, 170, 172, 179,
+                                          183, 185, 190, 194, 202, 206, 207, 210, 213, 219, 222, 224, 226, 252, 257]))
 
     return parser.parse_args(argv)
 

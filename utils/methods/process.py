@@ -13,7 +13,7 @@ def proc(args):
     args.singled_out = args.channels
     # show_signal(args.singled_out[0, :])
     # delete 0?
-    if (1):
+    if (0):
         args.singled_out = args.singled_out[:, :-36]
     # for cnt in range(args.channels.shape[0]):
     #    test = args.channels[cnt, np.abs(args.channels[cnt, :]) < 1]
@@ -50,20 +50,26 @@ def proc(args):
 
         for cnt in range(args.channels.shape[0]):
 
-            show_midplots = 1
+            # cz temp
+            # cnt = 68
+            show_midplots = 0
 
             if show_midplots:
                 print('channel raw')
-                show_signal(args.singled_out[cnt, :])
+                args.temp_add = 'raw'
+                show_signal(args.singled_out[cnt, :], args)
                 magnospec(args.singled_out[cnt, :], args.fs)
 
-            order = 5
+            order = 2
             cutoff = 3.667
-            args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
+            #args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
+            args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], 0.25, 100, args.fs, order)
+
 
             if show_midplots:
                 print('filtered')
-                show_signal(args.singled_out_filtered[cnt, :])
+                args.temp_add = 'filtered'
+                show_signal(args.singled_out_filtered[cnt, :], args)
                 magnospec(args.singled_out_filtered[cnt, :], args.fs)
 
             if (0):
@@ -92,7 +98,8 @@ def proc(args):
 
             if show_midplots:
                 print('notched')
-                show_signal(args.singled_out_filtered[cnt, :])
+                args.temp_add = 'notched'
+                show_signal(args.singled_out_filtered[cnt, :], args)
                 magnospec(args.singled_out_filtered_notched[cnt, :], args.fs)
     else:
         args.singled_out_filtered = args.singled_out
@@ -136,6 +143,20 @@ def Implement_Notch_Filter(fs, band, freq, ripple, order, filter_type, data):
                      analog=False, ftype=filter_type)
     filtered_data = lfilter(b, a, data)
     return filtered_data
+
+
+def butter_bandpass(data, lowcut, highcut, fs, order=5):
+    b, a = butter_filter_band(lowcut, highcut, fs, order=order)
+    y = signal.filtfilt(b, a, data)
+    return y
+
+
+def butter_filter_band(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = signal.butter(order, [low, high], btype='band')
+    return b, a
 
 
 def getStats(args):

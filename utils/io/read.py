@@ -28,7 +28,7 @@ def readchannels(args):
                     'a3_20191021_024940_singlefilemff2']
 
     # Python no (1 is 2, 0 is 1)
-    exp_no = 8  # argument!!
+    exp_no = 4  # argument!!
     args.experiment = experiment_list[exp_no]
 
     args.filename = 'data/' + experiment_list[exp_no]
@@ -37,6 +37,7 @@ def readchannels(args):
     data = loadmat(args.filename)
     args.channels = data[args.channel_name]
 
+    args.channels = args.channels[args.select_ch - 1, :]
     args.fs = data['EEGSamplingRate'][0][0]
     args.stims = data['evt_ECI_TCPIP_55513']
 
@@ -55,6 +56,8 @@ def readchannels(args):
         # cast to int - error
         relative = relative.astype(int)
         args.times = offset + relative
+
+    # comp_fig = loadmat('EEGLAB_figs/soft_reref.fig')
 
     return args
 

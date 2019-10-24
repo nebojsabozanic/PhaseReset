@@ -32,13 +32,16 @@ def show_insta_phase(signal):
     return 0
 
 
-def show_signal(signal):  # , t, output_dir, filename, axisname):
+def show_signal(signal, args):  # , t, output_dir, filename, axisname):
     plt.plot(signal)  # t,
-    # plt.title('Original signal')
+    tempname = args.experiment + args.temp_add
+    plt.title(tempname)
     # plt.ylabel('Amplitude')
     # plt.xlabel(axisname)
-    # plt.savefig(os.path.join(output_dir, filename))
+    plt.savefig(os.path.join(args.output_dir, tempname ))
     plt.show()
+    plt.waitforbuttonpress(0.1)
+    plt.close('all')
     return 0
 
 
@@ -99,8 +102,8 @@ def show_csignals(signal, output_dir, cnt):  # , t, output_dir, filename, axisna
     for cnt1 in range(0, signal.shape[0]):
         filename = str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
         plt.plot(t, signal[cnt1, :])  # t,
-        plt.show()
-        plt.waitforbuttonpress(0.1)
+        #plt.show()
+        #plt.waitforbuttonpress(0.1)
         plt.savefig(os.path.join(output_dir, filename))
         plt.close()
     #plt.ylim(-6, 6)
@@ -235,6 +238,6 @@ def showphases(step3):
 def magnospec(signal, fs):
 
     p1, xf = power_spectrum_fft(signal, fs)
-    #p1m = 20 * np.log10(p1 / max(p1))
-    showFFT(p1, xf)
+    p1m = 10 * np.log10(p1 * p1) # / max(p1)) doesn't work
+    showFFT(p1m, xf)
     return 0
