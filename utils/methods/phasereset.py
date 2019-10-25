@@ -22,6 +22,12 @@ def calc_phase_reset_idx(v, t_k, phi_j):
 
     return phase_index
 
+def calc_phase_reset_win(v, signal):
+
+    phase_index = np.exp(1j*v*2*math.pi*signal)
+
+    return phase_index
+
 
 # def calcPhaseResetIdxWin(v, t_k, phi_j, win_l, win_r):
 #
@@ -103,8 +109,14 @@ def histogram_phases(args):
         # phase_reset_here
 
         # print(len_uc)
-        args.nbin = 100
+        args.nbin = 200
         hist_wind = np.zeros([args.len_uc, args.nbin, args.win_l + args.win_r])
+        phase_reset_wind = np.zeros([args.len_uc, args.nbin, args.win_l + args.win_r])
+
+        phase_reset_wind = calc_phase_reset_win(1, wind_)
+
+        phase_reset_mean = np.zeros([args.len_uc, args.win_l + args.win_r])
+        phase_reset_std = np.zeros([args.len_uc, args.win_l + args.win_r])
 
         for i, uclass in enumerate(args.uc):
             ind = (args.uc_ind == i)
@@ -113,15 +125,24 @@ def histogram_phases(args):
                 test = np.histogram(temp[:, cnti], args.nbin, (0, 1))  # calc hist wind_[ind, :]
                 hist_wind[i, :, cnti] = test[0]
 
-            testimage = np.squeeze(hist_wind[0, :, :])
-            fig, ax = plt.subplots(nrows=1, ncols=1)
-            ax.imshow(testimage)  # , aspect='auto'
+            # step = np.abs(np.mean(phase_reset_wind[ind, :]))
+            # mean_step = np.mean()
+
+            phase_reset_mean[i, :] = np.abs(np.mean(phase_reset_wind[ind, :], 0))
+            phase_reset_std[i, :] = np.abs(np.std(phase_reset_wind[ind, :], 0))
+
+            testimage = np.squeeze(hist_wind[i, :, :])
+            # fig, ax = plt.subplots(nrows=1, ncols=1)
+            plt.imshow(testimage)  # , aspect='auto'
             plt.title(np.max(testimage))
-            ax.set_adjustable('box-forced')
+            #ax.set_adjustable('box-forced')
             filename = 'histophases' + str(cnt_ch) + 'ch' + str(i) + 'cl' + '.png'
-            plt.savefig(os.path.join(args.output_dir, filename))
+            plt.savefig(os.path.join(args.output_dir, filename), bbox_inches = 'tight', pad_inches = 0)
+            plt.close()
             # plt.show()
             # plt.waitforbuttonpress(0.1)
             # save_ call show (methods>disp)
+
+        show_csignals(phase_reset_mean, phase_reset_std, args.output_dir, cnt_ch, 'phase_reset_indx')
 
     return args

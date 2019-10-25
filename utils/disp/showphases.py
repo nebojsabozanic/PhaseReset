@@ -43,10 +43,10 @@ def show_phase_reset(signal1, output_dir):
     return 0
 
 
-def show_csignals(signal1, error, output_dir, cnt):
+def show_csignals(signal1, error, output_dir, cnt, str_name):
     t = np.arange(0, signal1.shape[1])
     for cnt1 in range(0, signal1.shape[0]):
-        filename = 'erps' + str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
+        filename = str_name + str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
         pl.plot(t, signal1[cnt1, :], color='#CC4F1B')  # t,
         pl.fill_between(t, signal1[cnt1, :] - error[cnt1, :], signal1[cnt1, :] + error[cnt1, :],
                         alpha=0.5, edgecolor='#FF9848', facecolor='#FF9848', antialiased=True, linewidth=0)

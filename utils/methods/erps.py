@@ -26,6 +26,6 @@ def get_erps(args):
         # args.ave_wind_all[cnt, :, :] = ave_wind
         # args.std_wind_all[cnt, :, :] = std_wind
 
-        show_csignals(ave_wind, std_wind, args.output_dir, cnt)
+        show_csignals(ave_wind, std_wind, args.output_dir, cnt, 'erps')
 
     return args
