@@ -114,8 +114,10 @@ def histogram_phases(args):
                 hist_wind[i, :, cnti] = test[0]
 
             testimage = np.squeeze(hist_wind[0, :, :])
+            fig, ax = plt.subplots(nrows=1, ncols=1)
+            ax.imshow(testimage)  # , aspect='auto'
             plt.title(np.max(testimage))
-            plt.imshow(testimage)
+            ax.set_adjustable('box-forced')
             filename = 'histophases' + str(cnt_ch) + 'ch' + str(i) + 'cl' + '.png'
             plt.savefig(os.path.join(args.output_dir, filename))
             # plt.show()

@@ -146,7 +146,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=0)
+                        help='generate artificial data', default=1)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)

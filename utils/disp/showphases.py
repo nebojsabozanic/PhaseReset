@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib import pyplot as pl
 
 # import os.path
 from utils.methods.fouriers import power_spectrum_fft
@@ -42,15 +43,18 @@ def show_phase_reset(signal1, output_dir):
     return 0
 
 
-def show_csignals(signal1, output_dir, cnt):
+def show_csignals(signal1, error, output_dir, cnt):
     t = np.arange(0, signal1.shape[1])
     for cnt1 in range(0, signal1.shape[0]):
         filename = 'erps' + str(cnt) + 'ch' + str(cnt1) + 'cl' + '.png'
-        plt.plot(t, signal1[cnt1, :])  # t,
+        pl.plot(t, signal1[cnt1, :], color='#CC4F1B')  # t,
+        pl.fill_between(t, signal1[cnt1, :] - error[cnt1, :], signal1[cnt1, :] + error[cnt1, :],
+                        alpha=0.5, edgecolor='#FF9848', facecolor='#FF9848', antialiased=True, linewidth=0)
+
         # plt.show()
         # plt.waitforbuttonpress(0.1)
-        plt.savefig(os.path.join(output_dir, filename))
-        plt.close()
+        pl.savefig(os.path.join(output_dir, filename))
+        pl.close()
     # plt.ylim(-6, 6)
     # plt.title('Original signal')
     # plt.ylabel('Amplitude')
