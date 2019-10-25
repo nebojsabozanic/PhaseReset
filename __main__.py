@@ -1,14 +1,6 @@
 """Pipeline for the tinnitus analysis###"""
-##############################################################
-# 1. load .mat, .set, .mff eventually connect with neuropype
 
-# 2. phase reset coefficient as described in ...
-
-# (emd)
-
-# plot 2d
-############################################################
-# Copyright (c) 2019 Nebojsa Bozanic, Peter Tass
+# Copyright (c) 2019 Nebojsa Bozanic, Tina Munjal, Peter Tass
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,15 +26,12 @@ import argparse
 from six import iteritems
 from subprocess import Popen, PIPE
 from utils.io.read import readchannels, surro
-from utils.methods.phasereset import calcInstaPhaseNorm, histogram_phases, getPhaseResetIndices #calcPhaseResetIdx, calcPhaseResetIdxWin, calcInstaPhaseNorm, calcPhaseResetIdxWin_c
-# from utils.methods.fouriers import calcFFT
-from utils.methods.n1p1 import getN1P1  # n1p1, rerefAll, n1p1c
-# from utils.disp.showphases import showphases, show_signal, show_windows, showFFT, show_2signals, show_insta_phase, show_csignals
-from utils.methods.process import proc, getStats
-# from scipy import signal
+from utils.methods.phasereset import histogram_phases
+from utils.methods.erps import get_erps
+from utils.methods.process import proc  # , getStats
 import time
-from utils.disp.showphases import show_examples
 import numpy as np
+
 
 def main(args):
 
@@ -74,7 +63,6 @@ def main(args):
     if args.surro:
         args = surro(args)
 
-
     # Write arguments to a text file
     write_arguments_to_file(args, os.path.join(log_dir, 'arguments.txt'))
 
@@ -84,17 +72,17 @@ def main(args):
     print(time.time() - start)
 
     # args.times = args.stims[1, 2:]
-    # args = getStats(args) # put in output
+    # args = get_stats(args) # put in output
 
     # add a progress bar
-    args = getN1P1(args)
+    args = get_erps(args)
 
     # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
     # args = getPhaseResetIndices(args)
 
-    args = histogram_phases(args) #.singled_out_filtered_notched, args.times, args.win_l, args.win_l, args.uc, args.uc_ind, args.len_uc)
+    histogram_phases(args)
 
 
 def store_revision_info(src_path, output_dir, arg_string):
@@ -179,8 +167,12 @@ def parse_arguments(argv):
                         help='select which channels are going to be used for rereferencing and the analysis',
                         default=np.array([2, 5, 10, 12, 15, 18, 21, 24, 26, 29, 34, 36, 37, 42, 44, 46, 47, 48, 49, 59,
                                           62, 64, 66, 67, 68, 69, 76, 79, 81,   84, 86, 87, 88, 94, 96, 97, 101, 106,
-                                          109, 116, 119, 126, 140, 142, 143, 150, 153, 161, 162, 164, 169, 170, 172, 179,
-                                          183, 185, 190, 194, 202, 206, 207, 210, 213, 219, 222, 224, 226, 252, 257]))
+                                          109, 116, 119, 126, 140, 142, 143, 150, 153, 161, 162, 164, 169, 170, 172,
+                                          179, 183, 185, 190, 194, 202, 206, 207, 210, 213, 219, 222, 224, 226, 252,
+                                          257]))
+
+    parser.add_argument('--show_midplots', type=bool,
+                        help='plot data between the processing steps', default=0)
 
     return parser.parse_args(argv)
 

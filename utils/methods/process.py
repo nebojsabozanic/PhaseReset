@@ -1,10 +1,9 @@
 import numpy as np
 from scipy import signal
-from utils.methods.fouriers import power_spectrum_fft
-from utils.disp.showphases import showFFT, show_signal, magnospec
+# from utils.methods.fouriers import power_spectrum_fft
+from utils.disp.showphases import show_fft, show_signal, magnospec
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils.methods.n1p1 import rerefAll
 import os
 
 
@@ -13,8 +12,8 @@ def proc(args):
     args.singled_out = args.channels
     # show_signal(args.singled_out[0, :])
     # delete 0?
-    if (0):
-        args.singled_out = args.singled_out[:, :-36]
+    # if (0):
+    #     args.singled_out = args.singled_out[:, :-36]
     # for cnt in range(args.channels.shape[0]):
     #    test = args.channels[cnt, np.abs(args.channels[cnt, :]) < 1]
 
@@ -41,7 +40,7 @@ def proc(args):
         # re - referencing change to spatial
         # czr = reref(cz, channels)
         if args.do_reref:
-            meanref = rerefAll(args.singled_out)
+            meanref = reref_all(args.singled_out)
             args.singled_out -= meanref
             # show_signal(singled_out)
 
@@ -50,53 +49,33 @@ def proc(args):
 
         for cnt in range(args.channels.shape[0]):
 
-            # cz temp
-            # cnt = 68
-            show_midplots = 0
-
-            if show_midplots:
+            if args.show_midplots:
                 print('channel raw')
                 args.temp_add = 'raw'
                 show_signal(args.singled_out[cnt, :], args)
                 magnospec(args.singled_out[cnt, :], args.fs)
 
-            order = 2
-            cutoff = 3.667
-            #args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order) # add to the object, and always take the last (as in the cell)
-            args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], 0.25, 100, args.fs, order)
+            args.order = 2
+            args.lf_cutoff = 0.25
+            args.hf_cutoff = 100.
+            # args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order)
+            # add to the object, and always take the last (as in the cell)
+            args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], args.lf_cutoff,
+                                                                args.hf_cutoff, args.fs, args.order)
 
-
-            if show_midplots:
+            if args.show_midplots:
                 print('filtered')
                 args.temp_add = 'filtered'
                 show_signal(args.singled_out_filtered[cnt, :], args)
                 magnospec(args.singled_out_filtered[cnt, :], args.fs)
 
-            if (0):
-                args.f0 = 60.
-                args.Q = 10.
-                b, a = signal.iirnotch(2 * args.f0 / args.fs, args.Q)
-                args.singled_out_filtered_notched[cnt, :] = signal.filtfilt(b, a, args.singled_out_filtered[cnt, :])
-            else:
-                # no hard coded!!!
-                args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 60., 5., 3, 'butter',
-                                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 120., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 180., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 240., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 300., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 360., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 420., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
-                #args.singled_out_filtered_notched[cnt, :] = Implement_Notch_Filter(1000., 0.5, 480., 5., 3, 'butter',
-                #                                                                   args.singled_out_filtered[cnt, :])
+            # no hard coded!!!
+            args.notch_width = 0.5
+            args.notch_freq = 60.
+            args.singled_out_filtered_notched[cnt, :] = implement_notch_filter(args.fs, args.notch_width, args.notch_freq, 5., 3, 'butter',
+                                                                               args.singled_out_filtered[cnt, :])
 
-            if show_midplots:
+            if args.show_midplots:
                 print('notched')
                 args.temp_add = 'notched'
                 show_signal(args.singled_out_filtered[cnt, :], args)
@@ -105,9 +84,9 @@ def proc(args):
         args.singled_out_filtered = args.singled_out
         args.singled_out_filtered_notched = args.singled_out
 
-    #low_band = 0.25
-    #high_band = 100
-    #args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], low_band, high_band, args.fs, order)
+    # low_band = 0.25
+    # high_band = 100
+    # args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], low_band, high_band, args.fs, order)
 
     return args
 
@@ -136,12 +115,12 @@ def butter_filter(data, cutoff, fs, order=5):
     return y
 
 
-def Implement_Notch_Filter(fs, band, freq, ripple, order, filter_type, data):
+def implement_notch_filter(fs, band, freq, ripple, order, filter_type, data):
     from scipy.signal import iirfilter, lfilter
-    nyq  = fs/2.0
-    low  = freq - band/2.0
+    nyq = fs/2.0
+    low = freq - band/2.0
     high = freq + band/2.0
-    low  = low/nyq
+    low = low/nyq
     high = high/nyq
     b, a = iirfilter(order, [low, high], rp=ripple, btype='bandstop',
                      analog=False, ftype=filter_type)
@@ -163,7 +142,7 @@ def butter_filter_band(lowcut, highcut, fs, order=5):
     return b, a
 
 
-def getStats(args):
+def get_stats(args):
 
     sns.set(color_codes=True)
     args.der = np.diff(args.times)
@@ -175,16 +154,26 @@ def getStats(args):
     plt.show()
     plt.savefig(os.path.join(args.output_dir, 'soa_distribution.png'))
     plt.close()
-    stop = 1
 
     return args
-# temp = stats.zscore(ave_y2_500)
-# print(temp)
-# print(max(temp))
-# print(np.argmax(temp))
-# print(len(temp))
-# show_signal(ave_y2_500)
-# show_signal(temp)
+
+
+def reref_all(selected_channels):
+    meanref = np.mean(selected_channels, 0)
+    return meanref
+
+
+def butter_lowpass(cutoff, fs, order=5):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
+    return b, a
+
+
+def butter_lowpass_filter(data, cutoff, fs, order=5):
+    b, a = butter_lowpass(cutoff, fs, order=order)
+    y = signal.filtfilt(b, a, data)
+    return y
 
 
 def ideally():
@@ -195,3 +184,12 @@ def ideally():
     # ...
 
     return 0
+
+
+# temp = stats.zscore(ave_y2_500)
+# print(temp)
+# print(max(temp))
+# print(np.argmax(temp))
+# print(len(temp))
+# show_signal(ave_y2_500)
+# show_signal(temp)

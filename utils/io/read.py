@@ -3,6 +3,7 @@ import numpy as np
 import random
 import os
 
+
 def readchannels(args):
 
     # select with mouse?
@@ -28,7 +29,7 @@ def readchannels(args):
                     'a3_20191021_024940_singlefilemff2']
 
     # Python no (1 is 2, 0 is 1)
-    exp_no = 4  # argument!!
+    exp_no = 7  # argument!!
     args.experiment = experiment_list[exp_no]
 
     args.filename = 'data/' + experiment_list[exp_no]
@@ -52,12 +53,8 @@ def readchannels(args):
         relative = times_all['times']
         relative = relative[0]
         relative *= args.fs
-        # relative =
-        # cast to int - error
         relative = relative.astype(int)
         args.times = offset + relative
-
-    # comp_fig = loadmat('EEGLAB_figs/soft_reref.fig')
 
     return args
 

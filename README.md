@@ -1,7 +1,7 @@
 # Phase Reset for Tinnitus Sound Therapy
 
 ## Compatibility
-The code is tested under Windows 10 with Python 3.6.
+The code is tested under Windows 10 with Python 3.6 and 3.7.
 
 ## News
 | Date     | Update |

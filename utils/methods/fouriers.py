@@ -4,10 +4,10 @@ from scipy.fftpack import fft
 
 def power_spectrum_fft(signal, fs):
 
-    L = len(signal)
+    length = len(signal)
     yf = fft(signal)
-    T = 1 / fs
-    xf = np.linspace(0.0, 1.0 / (2.0 * T), L // 2)
-    P1 =  2.0 / L * np.abs(yf[0:L // 2])
+    t = 1 / fs
+    xf = np.linspace(0.0, 1.0 / (2.0 * t), length // 2)
+    p1 = 2.0 / length * np.abs(yf[0:length // 2])
 
-    return P1, xf
+    return p1, xf
