@@ -23,4 +23,5 @@ data
 /data/
 
 # neuropype
-neuropype/
+neuropype/data
+/data/
