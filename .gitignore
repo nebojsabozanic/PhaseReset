@@ -23,4 +23,9 @@ data
 
 # neuropype
 neuropype/data
+
+# Mac
 /data/
+
+# win
+data.symlink
