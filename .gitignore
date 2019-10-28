@@ -20,6 +20,7 @@ logs/
 # data
 data/
 data
+.data/
 
 # neuropype
 neuropype/data
@@ -29,3 +30,6 @@ neuropype/data
 
 # win
 data.symlink
+data.symlink/
+/data.symlink
+/data.symlink/
