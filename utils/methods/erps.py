@@ -13,7 +13,8 @@ def get_erps(args):
         # magnospec(signal, args.fs)
         wind_ = np.zeros([len(args.times), args.win_l + args.win_r])
         for cnti, i in enumerate(args.times):
-            wind_[cnti, :] = signal[i - args.win_l: i + args.win_r]  # faster
+            baseline = np.mean(signal[i - args.win_l: i])
+            wind_[cnti, :] = signal[i - args.win_l: i + args.win_r] - baseline # baseline, faster
 
         ave_wind = np.zeros([args.len_uc, args.win_l + args.win_r])
         std_wind = np.zeros([args.len_uc, args.win_l + args.win_r])

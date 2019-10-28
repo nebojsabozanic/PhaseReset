@@ -146,7 +146,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=1)
+                        help='generate artificial data', default=0)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)
@@ -156,10 +156,12 @@ def parse_arguments(argv):
                         help='exponential decay parameter (strength)', default=9.)
     parser.add_argument('--erp_freq', type=float,
                         help='Frequency of the erp', default=7.)
+    parser.add_argument('--amp', type=float,
+                        help='Initial amplitude of the erp', default=.55)
     parser.add_argument('--signal_len', type=int,
                         help='generate artificial data', default=5e5)
     parser.add_argument('--jit', type=int,
-                        help='generate artificial data', default=2)
+                        help='generate artificial data', default=25)
     parser.add_argument('--noise_amp', type=float,
                         help='generate artificial data', default=0.2)
 

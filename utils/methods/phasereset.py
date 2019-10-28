@@ -10,7 +10,7 @@ import os
 def calc_insta_phase_norm(signal):
     y = hilbert(signal)
     angles = np.angle(y)
-    insta_phase = np.unwrap(angles)
+    insta_phase = np.unwrap(angles) # should we ingore this and go straight to the normsss
     insta_phase_norm = (insta_phase + math.pi)/(2*math.pi) % 1.
 
     return insta_phase_norm

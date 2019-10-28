@@ -22,14 +22,14 @@ def readchannels(args):
                     'a2_20190919_010845mff2',
                     'Tina10819round21_20191008_062255mff2',
                     'a1_20191011_043914nebosoftclicksmff2',
-                    'a1_20191011_044342neboloudclicksmff2',
+                    'a1_20191011_044342neboloudclicksmf f2',
                     'a1_20191011_044634nebo1sclicklessmff2',
                     'a1_20191021_023046_clickmff2',
                     'a2_20191021_023358_noclickmff2',
                     'a3_20191021_024940_singlefilemff2']
 
     # Python no (1 is 2, 0 is 1)
-    exp_no = 4  # argument!!
+    exp_no = 0  # argument!!
     args.experiment = experiment_list[exp_no]
 
     args.filename = 'data/' + experiment_list[exp_no]
@@ -65,7 +65,7 @@ def surro(args):
     # generate a fingerprint
     t_erp = np.arange(0, args.erp_len / args.sfs, 1 / args.sfs)
     exponential_decay = np.exp(-args.lambd * t_erp)
-    erp_osc = 1. * np.sin(2 * np.pi * args.erp_freq * t_erp)
+    erp_osc = args.amp * np.sin(2 * np.pi * args.erp_freq * t_erp)
     args.erp = erp_osc * exponential_decay
 
     args.signal_len = args.channels.shape[-1]
