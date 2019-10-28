@@ -20,6 +20,7 @@ logs/
 # data
 data/
 data
+/data/
 
 # neuropype
 neuropype/
