@@ -76,14 +76,14 @@ def main(args):
     # args = get_stats(args) # put in output
 
     # add a progress bar
-#    args = get_erps(args)
+    # args = get_erps(args)
 
     # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
     # args = getPhaseResetIndices(args)
 
- #   histogram_phases(args)
+    # histogram_phases(args)
 
     hes(args)
 
@@ -148,7 +148,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=0)
+                        help='generate artificial data', default=1)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)
@@ -163,7 +163,7 @@ def parse_arguments(argv):
     parser.add_argument('--signal_len', type=int,
                         help='generate artificial data', default=5e5)
     parser.add_argument('--jit', type=int,
-                        help='generate artificial data', default=25)
+                        help='generate artificial data', default=1)
     parser.add_argument('--noise_amp', type=float,
                         help='generate artificial data', default=0.2)
 
