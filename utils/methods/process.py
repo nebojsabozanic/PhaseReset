@@ -56,8 +56,8 @@ def proc(args):
                 magnospec(args.singled_out[cnt, :], args.fs)
 
             args.order = 2
-            args.lf_cutoff = 0.25
-            args.hf_cutoff = 100.
+            args.lf_cutoff = 4.
+            args.hf_cutoff = 8.
             # args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order)
             # add to the object, and always take the last (as in the cell)
             args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], args.lf_cutoff,

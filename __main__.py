@@ -29,7 +29,7 @@ from utils.io.read import readchannels, surro
 from utils.methods.phasereset import histogram_phases
 from utils.methods.erps import get_erps
 from utils.methods.process import proc  # , getStats
-from utils.methods.emd import hes
+from utils.methods.emd import hes, hes2
 import time
 import numpy as np
 
@@ -76,16 +76,16 @@ def main(args):
     # args = get_stats(args) # put in output
 
     # add a progress bar
-    # args = get_erps(args)
+    #! args = get_erps(args)
 
     # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
     # args = getPhaseResetIndices(args)
 
-    # histogram_phases(args)
+    #! histogram_phases(args)
 
-    hes(args)
+    hes2(args)
 
 def store_revision_info(src_path, output_dir, arg_string):
     # Get git hash
@@ -148,7 +148,7 @@ def parse_arguments(argv):
                         help='average rereferencing', default=1)
 
     parser.add_argument('--surro', type=bool,
-                        help='generate artificial data', default=1)
+                        help='generate artificial data', default=0)
 
     parser.add_argument('--sfs', type=float,
                         help='surro sampling frequency', default=1e3)

@@ -29,7 +29,7 @@ def readchannels(args):
                     'a3_20191021_024940_singlefilemff2']
 
     # Python no (1 is 2, 0 is 1)
-    exp_no = 5  # argument!!
+    exp_no = 0  # argument!!
     args.experiment = experiment_list[exp_no]
 
     args.filename = 'data/' + experiment_list[exp_no]

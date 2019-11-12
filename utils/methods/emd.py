@@ -1,8 +1,30 @@
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
-from PyEMD import EMD
+from PyEMD import EMD, Visualisation
+from utils.disp.showphases import show_signal, show_csignals  # showphases
 
+
+def hes2(args):
+    n = 10000
+    t = np.arange(0, n/args.fs, 1/args.fs)
+    S = args.singled_out[-1, 0:n]
+    args.temp_add = 'emd_raw'
+    show_signal(S, args)
+    emd = EMD()
+    emd.emd(S)
+    imfs, res = emd.get_imfs_and_residue()
+
+    # In general:
+    # components = EEMD()(S)
+    # imfs, res = components[:-1], components[-1]
+
+    vis = Visualisation()
+    vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
+    vis.plot_instant_freq(t, imfs=imfs)
+
+    vis.show()
+    return 0
 
 def hes(args):
     # fs = 10e3
@@ -79,7 +101,7 @@ def hes(args):
 
     #         testimage = np.squeeze(hist_wind[i, :, :])
     #         # fig, ax = plt.subplots(nrows=1, ncols=1)
-    #         plt.imshow(testimage)  # , aspect='auto'
+    #         plt.imshow(testimage)  # , aspect='auto'  `   
     #         plt.title(np.max(testimage))
     #         # ax.set_adjustable('box-forced')
     #         filename = 'histophases' + str(cnt_ch) + 'ch' + str(i) + 'cl' + '.png'
