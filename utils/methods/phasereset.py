@@ -2,11 +2,12 @@ import numpy as np
 from scipy.signal import hilbert
 import math
 from utils.disp.showphases import show_signal, show_csignals  # showphases
-# from scipy.fftpack import fft
+from scipy.fftpack import fft #, hilbert
 import matplotlib.pyplot as plt
 import os
+from numba import jit
 
-
+#@jit(nopython=True)
 def calc_insta_phase_norm(signal):
     y = hilbert(signal)
     angles = np.angle(y)

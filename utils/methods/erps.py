@@ -21,6 +21,7 @@ def get_erps(args):
 
         for i, uclass in enumerate(args.uc):
             ind = (args.uc_ind == i)
+            test = wind_[ind, :]
             ave_wind[i, :] = np.mean(wind_[ind, :], 0)
             std_wind[i, :] = np.std(wind_[ind, :], 0)
 

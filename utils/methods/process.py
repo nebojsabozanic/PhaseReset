@@ -5,6 +5,8 @@ from utils.disp.showphases import show_fft, show_signal, magnospec
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+from PyEMD import EMD, Visualisation
+
 
 
 def proc(args):
@@ -23,13 +25,18 @@ def proc(args):
     if len(args.channels[0, :]) % 2:
         args.singled_out = args.singled_out[:, :-1]  # potentially to all    args.singled_out_filtered = args.channels;
 
-    args.classes = args.stims[0, 2:]
+    if not args.flag:
+        args.classes = args.stims[0, 2:]
 
     if args.if_data_large:
         dur1 = args.dur - args.win_r
         ind = args.stims[1, 2:] < dur1
         args.times = args.times[ind]
         args.classes = args.classes[ind]
+
+    # problem with no classes or 1 class in case of one single file FIX BUGGG
+    #if args.classes.size < 4
+    #    args.classes = np.arrayprint
 
     args.uc, args.uc_ind = np.unique(args.classes, return_inverse=True)
     args.len_uc = len(args.uc)
@@ -56,8 +63,8 @@ def proc(args):
                 magnospec(args.singled_out[cnt, :], args.fs)
 
             args.order = 2
-            args.lf_cutoff = 4.
-            args.hf_cutoff = 8.
+            args.lf_cutoff = 1.
+            args.hf_cutoff = 100.
             # args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order)
             # add to the object, and always take the last (as in the cell)
             args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], args.lf_cutoff,
@@ -74,6 +81,20 @@ def proc(args):
             args.notch_freq = 60.
             args.singled_out_filtered_notched[cnt, :] = implement_notch_filter(args.fs, args.notch_width, args.notch_freq, 5., 3, 'butter',
                                                                                args.singled_out_filtered[cnt, :])
+
+            #show_signal(S, args)
+            #emd = EMD()
+            #S = args.singled_out[cnt, :]
+            #emd.emd(S)
+            #imfs, res = emd.get_imfs_and_residue()
+            #vis = Visualisation()
+            #t = np.arange(0, S.size/args.fs, 1/args.fs)
+            #vis.plot_imfs(imfs=imfs, residue=res, t=t, include_residue=True)
+            #vis.plot_instant_freq(t, imfs=imfs)
+
+            #vis.show()
+
+            #args.singled_out_filtered_notched[cnt, :] = imfs[0]
 
             if args.show_midplots:
                 print('notched')
