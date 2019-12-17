@@ -64,7 +64,7 @@ def proc(args):
 
             args.order = 2
             args.lf_cutoff = 1.
-            args.hf_cutoff = 100.
+            args.hf_cutoff = 4.
             # args.singled_out_filtered[cnt, :] = butter_filter(args.singled_out[cnt, :], cutoff, args.fs, order)
             # add to the object, and always take the last (as in the cell)
             args.singled_out_filtered[cnt, :] = butter_bandpass(args.singled_out[cnt, :], args.lf_cutoff,

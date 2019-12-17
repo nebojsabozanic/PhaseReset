@@ -76,12 +76,15 @@ def main(args):
     # args = get_stats(args)  # put in output
 
     # add a progress bar
-    # args = get_erps(args)
+    #args = get_erps(args)
 
     # show_examples(args)
 
     # get the instantaneous phases and their phase reset indices
     #args = getPhaseResetIndices(args)
+
+    # allign
+    args.channels =
 
     histogram_phases(args)
 

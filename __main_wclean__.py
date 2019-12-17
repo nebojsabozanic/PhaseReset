@@ -34,6 +34,9 @@ from PyEMD import EMD, Visualisation
 # from scipy.fftpack import fft
 from scipy.signal import hilbert
 from scipy import signal
+import scipy as sp
+import scipy.ndimage
+from scipy.signal import find_peaks
 
 def main(args):
 
@@ -72,8 +75,8 @@ def main(args):
     x = np.arange(-100,2000)
     #plt.plot(x, np.mean(cz_ind, 1)) #, 'LineWidth', 2
     #plt.show()
-    ##plot([0, 0], [-4, 4], 'LineWidth', 2)
-    #plot([-100, 1999], [0, 0], 'LineWidth', 2)
+    #plt.plot([0, 0], [-4, 4]) #, 'LineWidth', 2)
+    #plt.plot([-100, 1999], [0, 0]) #, 'LineWidth', 2)
     #xlim([-100 1000])
     #legend(num2str([1: 69]'))
 
@@ -81,20 +84,25 @@ def main(args):
     emd = EMD()
     n_tr = cz_ind.shape[1]
     nbin = 200
-    hist_wind = np.zeros([nbin, cz_ind.shape[0]])
+    hist_wind = np.zeros([nbin, cz_ind.shape[0]-1000])
     wind_ = np.zeros([cz_ind.shape[0], cz_ind.shape[1]])
+    allign_vals = np.zeros([cz_ind.shape[1]])
     for cnt_trial in range(0, n_tr):
 
         S = np.squeeze(cz_ind[:, cnt_trial])
-
+        #plt.plot(S)
+        #plt.show()
+        S1 = S[100:250]
+        minpos1 = np.argmin(S1)
+        allign_vals[cnt_trial] = minpos1 + 100
         order = 2
-        lf_cutoff = 1.
-        hf_cutoff = 4.
-        # imf3 = butter_bandpass(S, lf_cutoff, hf_cutoff, fs, order)
+        lf_cutoff = 4.
+        hf_cutoff = 100.
+        imf3 = butter_bandpass(S, lf_cutoff, hf_cutoff, fs, order)
 
         emd.emd(S)
         imfs, res = emd.get_imfs_and_residue()
-        imf3 = imfs[-3]
+        #imf3 = imfs[-3]
 
         #vis = Visualisation()
         #t = np.arange(0, S.size/fs, 1/fs)
@@ -117,7 +125,7 @@ def main(args):
         # let's say the algorithm above calculates the spectrum magnitude and gives us the imf which is in delta range
         # manually we have seen it is imfs[-3]
 
-        y2 = imf3
+        y2 = imf3 #S
         y = hilbert(y2)
         angles = np.angle(y)
         insta_phase = np.unwrap(angles)  # should we ingore this and go straight to the normsss
@@ -138,8 +146,16 @@ def main(args):
     #for i, uclass in enumerate(args.uc):
     #ind = (args.uc_ind == i)
     #temp = wind_[ind, :]
-    for cnti in range(wind_.shape[0]):
-        test = np.histogram(wind_[cnti, :], nbin, (0, 1))  # calc hist wind_[ind, :]
+
+    allign_vals = allign_vals.astype(int)
+    wind_alligned = np.zeros([cz_ind.shape[0]-1000, cz_ind.shape[1]])
+    for cnt_trial in range(0, n_tr):
+        print(allign_vals[cnt_trial] - 100)
+        print(allign_vals[cnt_trial] + 999)
+        wind_alligned[:, cnt_trial] = wind_[allign_vals[cnt_trial]-100:allign_vals[cnt_trial] + 1000, cnt_trial]
+
+    for cnti in range(wind_alligned.shape[0]):
+        test = np.histogram(wind_alligned[cnti, :], nbin, (0, 1))  # calc hist wind_[ind, :]
         hist_wind[:, cnti] = test[0]
 
     # step = np.abs(np.mean(phase_reset_wind[ind, :]))
@@ -149,15 +165,21 @@ def main(args):
     #phase_reset_std[i, :] = np.abs(np.std(phase_reset_wind[ind, :], 0))
 
     # fig, ax = plt.subplots(nrows=1, ncols=1)
-    plt.imshow(hist_wind)  # , aspect='auto'
-    plt.title(np.max(hist_wind))
+    sigma_y = 2.0
+    sigma_x = 2.0
+    sigma = [sigma_y, sigma_x]
+    y = sp.ndimage.filters.gaussian_filter(hist_wind, sigma, mode='constant')
+    plt.imshow(y)  # , aspect='auto'
+    #plt.title(np.max(y))
+
     # ax.set_adjustable('box-forced')
     #filename = 'histophases' + str(cnt_ch) + 'ch' + str(i) + 'cl' + '.png'
     #plt.savefig(os.path.join(args.output_dir, filename), bbox_inches='tight', pad_inches=0)
     #plt.close()
     plt.show()
-    # plt.waitforbuttonpress(0.1)
-    # save_ call show (methods>disp)
+    plt.waitforbuttonpress(0.1)
+    plt.close()
+    #save_ call show (methods>disp)
 
 def store_revision_info(src_path, output_dir, arg_string):
     # Get git hash

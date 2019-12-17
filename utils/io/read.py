@@ -41,7 +41,7 @@ def readchannels(args):
                     'a2_20191208_070804_20msshufflemff2']
 
     # Python no (1 is 2, 0 is 1)
-    exp_no = 0  # argument!!
+    exp_no = 12  # argument!!
     args.experiment = experiment_list[exp_no]
 
     args.filename = 'data/'     + experiment_list[exp_no]
@@ -75,7 +75,7 @@ def readchannels(args):
         relative *= args.fs
         relative = relative.astype(int)
         args.times = offset + relative
-        args.stimuli = np.arange(1000, 12000, 2000)  # np.array([30]) #
+        args.stimuli = np.arange(1000, 12000, 2000)  # np.array(1000)
         args.reps = 50  # 300
         repmat = np.tile(args.stimuli, (args.reps, 1))
         repmat_transposed = repmat.transpose()

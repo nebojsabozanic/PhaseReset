@@ -6,10 +6,14 @@ from scipy.fftpack import fft #, hilbert
 import matplotlib.pyplot as plt
 import os
 from numba import jit
+import scipy as sp
+import scipy.ndimage
 
 #@jit(nopython=True)
 def calc_insta_phase_norm(signal):
+    print('in')
     y = hilbert(signal)
+    print('out')
     angles = np.angle(y)
     insta_phase = np.unwrap(angles) # should we ingore this and go straight to the normsss
     insta_phase_norm = (insta_phase + math.pi)/(2*math.pi) % 1.
@@ -96,7 +100,9 @@ def getPhaseResetIndices(args):
 
 def histogram_phases(args):
 
-    for cnt_ch in range(args.singled_out_filtered_notched.shape[0]):
+    #for cnt_ch in range(args.singled_out_filtered_notched.shape[0]):
+    if 1:
+        cnt_ch = 68
         y2 = args.singled_out_filtered_notched[cnt_ch, :]
         insta_phase_norm = calc_insta_phase_norm(y2)
 
@@ -133,9 +139,13 @@ def histogram_phases(args):
             phase_reset_std[i, :] = np.abs(np.std(phase_reset_wind[ind, :], 0))
 
             testimage = np.squeeze(hist_wind[i, :, :])
+            sigma_y = 2.0
+            sigma_x = 2.0
+            sigma = [sigma_y, sigma_x]
+            y = sp.ndimage.filters.gaussian_filter(testimage, sigma, mode='constant')
             # fig, ax = plt.subplots(nrows=1, ncols=1)
-            plt.imshow(testimage)  # , aspect='auto'
-            plt.title(np.max(testimage))
+            plt.imshow(y)  # , aspect='auto'
+            plt.title(np.max(y))
             #ax.set_adjustable('box-forced')
             filename = 'histophases' + str(cnt_ch) + 'ch' + str(i) + 'cl' + '.png'
             plt.savefig(os.path.join(args.output_dir, filename), bbox_inches = 'tight', pad_inches = 0)
